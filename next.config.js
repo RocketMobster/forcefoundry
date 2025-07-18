@@ -1,13 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  images: {
-    unoptimized: true
-  },
-  // GitHub Pages deployment configuration - only apply in production
-  basePath: process.env.NODE_ENV === 'production' ? '/forcefoundry' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/forcefoundry/' : '',
+  // Add any Vercel/Next.js config here if needed
 }
 
 module.exports = nextConfig
