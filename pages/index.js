@@ -12,7 +12,6 @@ import forceSystem from '../data/force_system.json';
 
 // Get all available species from the data files
 const availableSpecies = Object.keys(maleFirstNames);
-
 // Local Star Wars data to avoid API dependency issues
 const starWarsSpecies = availableSpecies;
 
@@ -21,6 +20,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState('Random');
   const [statSystem, setStatSystem] = useState('traditional'); // 'traditional' or 'swtor'
+  const [aiPortraitEnabled, setAiPortraitEnabled] = useState(false); // Toggle for AI portraits (disabled by default)
 
   const getRandom = (arr) => {
     if (!arr || arr.length === 0) return null;
@@ -54,12 +54,13 @@ export default function Home() {
   };
 
   const generateCharacter = async (randomizeAll = false) => {
-    setLoading(true);
-    const gender = randomizeAll ? getRandom(['male', 'female', 'other']) : character?.gender || 'male';
-    const charClass = randomizeAll ? getRandom(Object.keys(statSystems[statSystem])) : character?.charClass || 'Jedi';
+    try {
+      setLoading(true);
+      const gender = randomizeAll ? getRandom(['male', 'female', 'other']) : character?.gender || 'male';
+      const charClass = randomizeAll ? getRandom(Object.keys(statSystems[statSystem])) : character?.charClass || 'Jedi';
 
-    // Get the current stat system classes
-    const currentClasses = statSystems[statSystem];
+      // Get the current stat system classes
+      const currentClasses = statSystems[statSystem];
 
     // Determine species
     let characterSpecies;
@@ -112,27 +113,45 @@ export default function Home() {
     const alignment = getRandom(alignments);
     const homeworld = getStarWarsData('planets');
 
-    // For now, we'll use placeholder images until AI service is available
-    let imageUrl = null; // No image URL, will show character icon instead
+    // AI Portrait Generation with SubNP API (optional)
+    let imageUrl = null;
+    let imageError = null;
     
-    // Future: Re-enable when AI service is working
-    /*
-    try {
-      const imageRes = await fetch('https://api.subnp.com/image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: `${gender} ${charClass} star wars portrait` })
-      });
-      
-      if (imageRes.ok) {
-        const imageData = await imageRes.json();
-        imageUrl = imageData.image_url || imageUrl;
-      }
-    } catch (error) {
-      console.error('Failed to generate AI image:', error);
-      // Will use placeholder image
+    if (aiPortraitEnabled) {
+      // Use local API route to avoid CORS and keep key secret
+      setTimeout(() => {
+        const prompt = `${gender} ${characterSpecies} ${charClass} from Star Wars, portrait style, detailed face, ${alignment} alignment, professional character art`;
+        fetch('/api/replicate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        })
+          .then(async (res) => {
+            if (!res.ok) {
+              const errorText = await res.text();
+              setCharacter(prev => prev ? {
+                ...prev,
+                image: null,
+                imageError: `API Error: ${res.status} - ${res.statusText}: ${errorText}`
+              } : prev);
+              return;
+            }
+            const data = await res.json();
+            setCharacter(prev => prev ? {
+              ...prev,
+              image: data.imageUrl,
+              imageError: null
+            } : prev);
+          })
+          .catch((error) => {
+            setCharacter(prev => prev ? {
+              ...prev,
+              image: null,
+              imageError: error.message || 'Unknown error'
+            } : prev);
+          });
+      }, 100);
     }
-    */
 
     const stats = Object.fromEntries(
       Object.entries(currentClasses[charClass].stats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
@@ -178,6 +197,7 @@ export default function Home() {
       species: characterSpecies,
       homeworld,
       image: imageUrl,
+      imageError,
       stats,
       icon: currentClasses[charClass].icon,
       forceSensitivity,
@@ -186,6 +206,12 @@ export default function Home() {
       statSystem
     });
     setLoading(false);
+  } catch (error) {
+    console.error('Error generating character:', error);
+    setLoading(false);
+    // Show error to user but don't crash the app
+    alert('Failed to generate character. Please try again.');
+  }
   };
 
   const downloadJSON = () => {
@@ -250,6 +276,41 @@ export default function Home() {
     });
   };
 
+  const generateNewPortrait = async () => {
+    if (!character) return;
+    try {
+      setLoading(true);
+      let imageUrl = null;
+      let imageError = null;
+      const prompt = `${character.gender} ${character.species} ${character.charClass} from Star Wars, portrait style, detailed face, ${character.alignment} alignment, professional character art`;
+      const res = await fetch('/api/replicate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`API Error: ${res.status} - ${res.statusText}: ${errorText}`);
+      }
+      const data = await res.json();
+      imageUrl = data.imageUrl;
+      setCharacter({
+        ...character,
+        image: imageUrl,
+        imageError: null
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error('Error generating new portrait:', error);
+      setLoading(false);
+      setCharacter({
+        ...character,
+        image: null,
+        imageError: error.message || 'Unknown error'
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <Header />
@@ -300,6 +361,31 @@ export default function Home() {
           </p>
         </div>
 
+        {/* AI Portrait Toggle */}
+        <div className="max-w-md mx-auto mb-6">
+          <label className="flex items-center justify-between text-sm font-medium text-gray-300">
+            <span>AI Portrait Generation:</span>
+            <button
+              onClick={() => setAiPortraitEnabled(!aiPortraitEnabled)}
+              className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 ${
+                aiPortraitEnabled ? 'bg-blue-600' : 'bg-gray-600'
+              }`}
+            >
+              <span
+                className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ${
+                  aiPortraitEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </label>
+          <p className="text-xs text-gray-500 mt-1">
+            {aiPortraitEnabled 
+              ? 'Characters will attempt to generate AI portraits (may fail if API unavailable)'
+              : 'Characters will use class icons instead of AI portraits'
+            }
+          </p>
+        </div>
+
       <div className="flex justify-center gap-4 mb-6">
         <button
           onClick={() => generateCharacter(false)}
@@ -327,6 +413,17 @@ export default function Home() {
               <span>🎲</span>
               Reroll Name
             </button>
+            {aiPortraitEnabled && (
+              <button
+                onClick={generateNewPortrait}
+                disabled={loading}
+                className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 px-4 py-2 rounded flex items-center gap-2"
+                title="Generate a new AI portrait"
+              >
+                <span>🖼️</span>
+                {loading ? 'Generating...' : 'New Portrait'}
+              </button>
+            )}
             <button
               onClick={downloadJSON}
               className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2"
@@ -345,22 +442,57 @@ export default function Home() {
             <p><span className="text-blue-400">🔄 Same Type:</span> Generate another {character.gender} {character.charClass}</p>
             <p><span className="text-purple-400">🎲 New Character:</span> Randomize everything (gender, class, etc.)</p>
             <p><span className="text-orange-400">🎲 Reroll Name:</span> Generate a new name for this character</p>
+            {aiPortraitEnabled && (
+              <p><span className="text-purple-400">🖼️ New Portrait:</span> Generate a new AI portrait</p>
+            )}
           </div>
         ) : (
           <p>Click <span className="text-blue-400">Generate Character</span> to create your first Star Wars character!</p>
         )}
       </div>
 
-      {loading && <p className="text-center">Generating image... please wait.</p>}
+      {loading && (
+        <div className="text-center">
+          <div className="text-lg mb-2">Generating character...</div>
+          <div className="text-sm text-gray-400">Creating AI portrait and character data</div>
+        </div>
+      )}
 
       {character && !loading && (
         <div className="max-w-xl mx-auto bg-gray-800 rounded-xl p-6 shadow-md">
-          <div className="w-full h-64 bg-gray-700 rounded mb-4 flex items-center justify-center">
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
+          <div className="w-full h-64 bg-gray-700 rounded mb-4 flex items-center justify-center overflow-hidden">
+            {character.image ? (
+              <img 
+                src={character.image} 
+                alt={`${character.name} portrait`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Fallback to character icon if image fails to load
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div className="w-full h-full flex items-center justify-center text-gray-400" 
+                 style={{ display: character.image ? 'none' : 'flex' }}>
               <div className="text-center">
                 <div className="text-6xl mb-4">{character.icon}</div>
                 <div className="text-lg font-semibold text-white">{character.charClass}</div>
-                <div className="text-sm text-gray-300">Character Portrait</div>
+                <div className="text-sm text-gray-300">
+                  {character.imageError ? (
+                    <div className="text-center">
+                      <div className="text-red-400 text-xs mb-1">Portrait generation failed:</div>
+                      <div className="text-red-300 text-xs">{character.imageError}</div>
+                      {aiPortraitEnabled && (
+                        <div className="text-yellow-400 text-xs mt-1">
+                          Try the "🖼️ New Portrait" button or disable AI portraits
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    'Character Portrait'
+                  )}
+                </div>
               </div>
             </div>
           </div>

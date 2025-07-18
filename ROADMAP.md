@@ -60,11 +60,17 @@
   - [x] Force-specific abilities and traits
 
 ### 🖼️ **Visual Enhancements**
-- [ ] **Character Portraits**
-  - [ ] Reconnect SubNP API for AI-generated portraits
-  - [ ] Add fallback image system
-  - [ ] Implement image caching for performance
-  - [ ] Add "🖼️ Generate New Portrait" button
+- [x] **Character Portraits**
+  - [x] Reconnect SubNP API for AI-generated portraits
+  - [x] Add fallback image system
+  - [x] Implement image caching for performance
+  - [x] Add "🖼️ Generate New Portrait" button
+  - [x] **Enhanced Portrait Features**
+    - [x] Detailed AI prompts with species, class, and alignment
+    - [x] Error handling and user feedback
+    - [x] Graceful fallback to character icons
+    - [x] Separate portrait regeneration function
+    - [x] Loading states and disabled button handling
 
 ### ⚙️ **Settings & Configuration**
 - [ ] **Settings Page Development**
