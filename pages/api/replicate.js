@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
   const REPLICATE_API_TOKEN = process.env.NEXT_PUBLIC_REPLICATE_API_TOKEN;
   const REPLICATE_API_URL = 'https://api.replicate.com/v1/predictions';
-  const REPLICATE_MODEL_VERSION = 'a9758cb8e1e6e0e2e3e1e7e1e7e1e7e1e7e1e7e1e7e1e7e1e7e1e7e1e7e1e7';
+  const REPLICATE_MODEL_VERSION = '7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc';
 
   const { prompt } = req.body;
   if (!prompt) {
