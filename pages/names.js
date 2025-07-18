@@ -254,12 +254,27 @@ export default function Names() {
 
         {/* Filter Display */}
         {names.length > 0 && (
-          <div className="mb-6">
-            <p className="text-sm text-gray-400">
-              Filter: <span className="text-blue-400">{gender.toLowerCase()}</span>, 
-              <span className="text-purple-400"> {species}</span>, 
-              {quantity} names
-            </p>
+          <div className="mb-6 bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Gender:</span>
+                <span className="bg-blue-600 text-white px-2 py-1 rounded-full font-medium">
+                  {gender}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Species:</span>
+                <span className="bg-purple-600 text-white px-2 py-1 rounded-full font-medium">
+                  {species}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400">Count:</span>
+                <span className="bg-green-600 text-white px-2 py-1 rounded-full font-medium">
+                  {quantity} names
+                </span>
+              </div>
+            </div>
           </div>
         )}
 
@@ -269,30 +284,69 @@ export default function Names() {
             {names.map((nameObj) => (
               <div
                 key={nameObj.id}
-                className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-shadow border"
+                className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 text-center shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 border border-gray-700 hover:border-blue-500"
               >
-                <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
-                  Star Wars name {nameObj.id}
+                {/* Card Header */}
+                <div className="flex justify-between items-center mb-4">
+                  <div className="text-xs text-gray-400 uppercase tracking-wide font-medium">
+                    #{nameObj.id}
+                  </div>
+                  <div className="text-xs text-blue-400 font-semibold">
+                    {nameObj.gender}
+                  </div>
                 </div>
-                <div className="text-xl font-bold text-gray-800 mb-3">
-                  {nameObj.name}
+
+                {/* Main Name Display */}
+                <div className="mb-4">
+                  <div className="text-2xl font-bold text-white mb-2 leading-tight">
+                    {nameObj.name}
+                  </div>
+                  <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto w-16"></div>
                 </div>
-                <div className="text-sm text-gray-600">
-                  <div>Gender: {nameObj.gender}</div>
-                  <div>Species: {nameObj.species}</div>
-                  {nameObj.nameType !== 'standard' && (
-                    <div className="text-xs text-blue-600 mt-1 font-medium">
-                      {nameObj.nameType === 'middle' && '• Middle name'}
-                      {nameObj.nameType === 'hyphenated-prefix-first' && '• Hyphenated first (prefix)'}
-                      {nameObj.nameType === 'hyphenated-suffix-first' && '• Hyphenated first (suffix)'}
-                      {nameObj.nameType === 'hyphenated-prefix-last' && '• Hyphenated last (prefix)'}
-                      {nameObj.nameType === 'hyphenated-suffix-last' && '• Hyphenated last (suffix)'}
-                      {nameObj.nameType === 'traditional-hyphenated' && '• Traditional hyphenated'}
+
+                {/* Species Badge */}
+                <div className="mb-4">
+                  <span className="inline-block bg-purple-900 text-purple-200 px-3 py-1 rounded-full text-sm font-medium">
+                    {nameObj.species}
+                  </span>
+                </div>
+
+                {/* Name Type Indicator */}
+                {nameObj.nameType !== 'standard' && (
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg border-l-4 border-blue-500">
+                    <div className="text-xs text-gray-300 font-medium">
+                      {nameObj.nameType === 'middle' && '✨ Contains middle name'}
+                      {nameObj.nameType === 'hyphenated-prefix-first' && '🔗 Hyphenated first (prefix)'}
+                      {nameObj.nameType === 'hyphenated-suffix-first' && '🔗 Hyphenated first (suffix)'}
+                      {nameObj.nameType === 'hyphenated-prefix-last' && '🔗 Hyphenated last (prefix)'}
+                      {nameObj.nameType === 'hyphenated-suffix-last' && '🔗 Hyphenated last (suffix)'}
+                      {nameObj.nameType === 'traditional-hyphenated' && '🔗 Traditional hyphenated'}
                       {nameObj.nameType === 'crazy-cross-species' && (
-                        <span className="text-orange-500">🌪️ Cross-species chaos</span>
+                        <span className="text-orange-400 font-bold">🌪️ Cross-species chaos</span>
                       )}
                     </div>
-                  )}
+                  </div>
+                )}
+
+                {/* Quick Actions */}
+                <div className="mt-4 flex justify-center space-x-2">
+                  <button
+                    onClick={() => navigator.clipboard.writeText(nameObj.name)}
+                    className="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-700"
+                    title="Copy to clipboard"
+                  >
+                    📋
+                  </button>
+                  <button
+                    onClick={() => {
+                      const data = `Name: ${nameObj.name}\nGender: ${nameObj.gender}\nSpecies: ${nameObj.species}`;
+                      navigator.clipboard.writeText(data);
+                    }}
+                    className="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-700"
+                    title="Copy full details"
+                  >
+                    📄
+                  </button>
                 </div>
               </div>
             ))}
@@ -302,11 +356,14 @@ export default function Names() {
         {/* Empty State */}
         {names.length === 0 && !loading && (
           <div className="text-center py-12">
-            <div className="text-4xl mb-4">📝</div>
-            <h3 className="text-xl font-semibold mb-2">Ready to Generate Names</h3>
-            <p className="text-gray-400 mb-6">
-              Choose your preferences and click Generate to create Star Wars character names
-            </p>
+            <div className="bg-gray-800 rounded-xl p-8 max-w-md mx-auto border border-gray-700">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-xl font-semibold mb-2 text-white">Ready to Generate Names</h3>
+              <p className="text-gray-400 mb-6">
+                Choose your preferences and click Generate to create Star Wars character names
+              </p>
+              <div className="h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto w-16"></div>
+            </div>
           </div>
         )}
       </main>

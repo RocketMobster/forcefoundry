@@ -5,15 +5,10 @@ import maleLastNames from '../data/male_last_names.json';
 import femaleFirstNames from '../data/female_first_names.json';
 import femaleLastNames from '../data/female_last_names.json';
 import otherNamesNeutral from '../data/other_names_neutral.json';
-
-const classes = {
-  Jedi: { stats: { strength: 6, agility: 8, intellect: 7 }, icon: '🧘' },
-  Sith: { stats: { strength: 8, agility: 7, intellect: 6 }, icon: '⚡' },
-  BountyHunter: { stats: { strength: 7, agility: 9, intellect: 5 }, icon: '🎯' },
-  Smuggler: { stats: { strength: 5, agility: 7, intellect: 8 }, icon: '🚀' }
-};
-
-const alignments = ['Light Side', 'Dark Side', 'Neutral'];
+import statSystems from '../data/stat_systems.json';
+import alignments from '../data/alignments.json';
+import starWarsPlanets from '../data/planets.json';
+import forceSystem from '../data/force_system.json';
 
 // Get all available species from the data files
 const availableSpecies = Object.keys(maleFirstNames);
@@ -21,16 +16,11 @@ const availableSpecies = Object.keys(maleFirstNames);
 // Local Star Wars data to avoid API dependency issues
 const starWarsSpecies = availableSpecies;
 
-const starWarsPlanets = [
-  'Tatooine', 'Coruscant', 'Naboo', 'Alderaan', 'Hoth', 'Endor', 'Kamino', 
-  'Mustafar', 'Dagobah', 'Yavin 4', 'Bespin', 'Jakku', 'Scarif', 'Ryloth',
-  'Kashyyyk', 'Geonosis', 'Utapau', 'Mygeeto'
-];
-
 export default function Home() {
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState('Random');
+  const [statSystem, setStatSystem] = useState('traditional'); // 'traditional' or 'swtor'
 
   const getRandom = (arr) => {
     if (!arr || arr.length === 0) return null;
@@ -66,7 +56,10 @@ export default function Home() {
   const generateCharacter = async (randomizeAll = false) => {
     setLoading(true);
     const gender = randomizeAll ? getRandom(['male', 'female', 'other']) : character?.gender || 'male';
-    const charClass = randomizeAll ? getRandom(Object.keys(classes)) : character?.charClass || 'Jedi';
+    const charClass = randomizeAll ? getRandom(Object.keys(statSystems[statSystem])) : character?.charClass || 'Jedi';
+
+    // Get the current stat system classes
+    const currentClasses = statSystems[statSystem];
 
     // Determine species
     let characterSpecies;
@@ -142,8 +135,40 @@ export default function Home() {
     */
 
     const stats = Object.fromEntries(
-      Object.entries(classes[charClass].stats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
+      Object.entries(currentClasses[charClass].stats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
     );
+
+    // Add hitpoints for SWTOR system (endurance * 10)
+    if (statSystem === 'swtor' && stats.endurance) {
+      stats.hitpoints = stats.endurance * 10;
+    }
+
+    // Force System Integration
+    let forceSensitivity, lightsaberColor, forceAbilities;
+    
+    if (charClass === 'Jedi') {
+      forceSensitivity = 'Jedi';
+    } else if (charClass === 'Sith') {
+      forceSensitivity = 'Sith';
+    } else {
+      // For other classes, random chance of Force sensitivity
+      const forceChance = Math.random();
+      if (forceChance < 0.05) {
+        forceSensitivity = 'Gray Jedi';
+      } else if (forceChance < 0.15) {
+        forceSensitivity = 'Force Sensitive';
+      } else {
+        forceSensitivity = 'Non-Force User';
+      }
+    }
+
+    // Generate lightsaber color for Force users
+    if (forceSensitivity !== 'Non-Force User' && forceSensitivity !== 'Force Sensitive') {
+      lightsaberColor = getRandom(forceSystem.lightsaberColors);
+    }
+
+    // Get Force abilities
+    forceAbilities = forceSystem.forceAbilities[forceSensitivity] || [];
 
     setCharacter({
       name: finalName,
@@ -154,7 +179,11 @@ export default function Home() {
       homeworld,
       image: imageUrl,
       stats,
-      icon: classes[charClass].icon
+      icon: currentClasses[charClass].icon,
+      forceSensitivity,
+      lightsaberColor,
+      forceAbilities,
+      statSystem
     });
     setLoading(false);
   };
@@ -166,6 +195,59 @@ export default function Home() {
     a.href = url;
     a.download = `${character.name.replace(/ /g, '_')}.json`;
     a.click();
+  };
+
+  const rerollName = () => {
+    if (!character) return;
+    
+    // Use the existing character's gender and species for consistent name generation
+    const { gender, species: characterSpecies } = character;
+    
+    // Check if the species exists in all required JSON files for name variations
+    const speciesExistsInAllFiles = (
+      (maleFirstNames[characterSpecies] && maleFirstNames[characterSpecies].length > 0) &&
+      (femaleFirstNames[characterSpecies] && femaleFirstNames[characterSpecies].length > 0) &&
+      (maleLastNames[characterSpecies] && maleLastNames[characterSpecies].length > 0) &&
+      (femaleLastNames[characterSpecies] && femaleLastNames[characterSpecies].length > 0) &&
+      (otherNamesNeutral[characterSpecies] && otherNamesNeutral[characterSpecies].length > 0)
+    );
+
+    // Generate new names using the same logic as generateCharacter
+    let firstName, lastName;
+    if (gender === 'male') {
+      firstName = getNameFromSpecies(maleFirstNames, characterSpecies);
+      lastName = getNameFromSpecies(maleLastNames, characterSpecies);
+    } else if (gender === 'female') {
+      firstName = getNameFromSpecies(femaleFirstNames, characterSpecies);
+      lastName = getNameFromSpecies(femaleLastNames, characterSpecies);
+    } else {
+      // For 'other' gender, randomly pick from either male or female first names
+      const nameData = Math.random() < 0.5 ? maleFirstNames : femaleFirstNames;
+      const lastNameData = Math.random() < 0.5 ? maleLastNames : femaleLastNames;
+      firstName = getNameFromSpecies(nameData, characterSpecies);
+      lastName = getNameFromSpecies(lastNameData, characterSpecies);
+    }
+
+    // Simple name generation (no middle names or hyphenation unless species exists in all files)
+    let finalName = `${firstName} ${lastName}`;
+
+    // Only add variations if species exists in all files (same logic as generateCharacter)
+    if (speciesExistsInAllFiles) {
+      const neutralNames = otherNamesNeutral[characterSpecies] || [];
+      const variationChance = Math.random();
+      
+      if (variationChance < 0.05 && neutralNames.length > 0) {
+        // 5% chance: Middle name for character generator
+        const middleName = getRandom(neutralNames);
+        finalName = `${firstName} ${middleName} ${lastName}`;
+      }
+    }
+
+    // Update only the character's name, keeping everything else the same
+    setCharacter({
+      ...character,
+      name: finalName
+    });
   };
 
   return (
@@ -197,6 +279,27 @@ export default function Home() {
           </p>
         </div>
 
+        {/* Stat System Toggle */}
+        <div className="max-w-md mx-auto mb-6">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Stat System:
+          </label>
+          <select
+            value={statSystem}
+            onChange={(e) => setStatSystem(e.target.value)}
+            className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+          >
+            <option value="traditional">Traditional RPG (Str, Agi, Int, Wis, Cha, Con)</option>
+            <option value="swtor">Star Wars: The Old Republic (Str, End, Aim, Cun, Will, HP)</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            {statSystem === 'traditional' 
+              ? 'Classic D&D-style attributes for general RPG systems'
+              : 'SWTOR-specific stats with hitpoints calculated from endurance (x10)'
+            }
+          </p>
+        </div>
+
       <div className="flex justify-center gap-4 mb-6">
         <button
           onClick={() => generateCharacter(false)}
@@ -215,13 +318,23 @@ export default function Home() {
           New Character
         </button>
         {character && (
-          <button
-            onClick={downloadJSON}
-            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2"
-          >
-            <span>💾</span>
-            Download JSON
-          </button>
+          <>
+            <button
+              onClick={rerollName}
+              className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded flex items-center gap-2"
+              title="Generate a new name for this character"
+            >
+              <span>🎲</span>
+              Reroll Name
+            </button>
+            <button
+              onClick={downloadJSON}
+              className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2"
+            >
+              <span>💾</span>
+              Download JSON
+            </button>
+          </>
         )}
       </div>
 
@@ -231,6 +344,7 @@ export default function Home() {
           <div className="space-y-1">
             <p><span className="text-blue-400">🔄 Same Type:</span> Generate another {character.gender} {character.charClass}</p>
             <p><span className="text-purple-400">🎲 New Character:</span> Randomize everything (gender, class, etc.)</p>
+            <p><span className="text-orange-400">🎲 Reroll Name:</span> Generate a new name for this character</p>
           </div>
         ) : (
           <p>Click <span className="text-blue-400">Generate Character</span> to create your first Star Wars character!</p>
@@ -256,13 +370,45 @@ export default function Home() {
           <p><strong>Alignment:</strong> {character.alignment}</p>
           <p><strong>Species:</strong> {character.species}</p>
           <p><strong>Homeworld:</strong> {character.homeworld}</p>
+          
+          {/* Force System Display */}
+          <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+            <h3 className="font-semibold text-purple-300 mb-2">Force Connection</h3>
+            <p><strong>Force Sensitivity:</strong> {character.forceSensitivity}</p>
+            {character.lightsaberColor && (
+              <p><strong>Lightsaber Color:</strong> <span className="text-yellow-400">{character.lightsaberColor}</span></p>
+            )}
+            {character.forceAbilities && character.forceAbilities.length > 0 && (
+              <div className="mt-2">
+                <strong>Force Abilities:</strong>
+                <ul className="list-disc list-inside ml-4 text-sm text-gray-300">
+                  {character.forceAbilities.map((ability, index) => (
+                    <li key={index}>{ability}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
           <div className="mt-4">
-            <h3 className="font-semibold">Stats:</h3>
-            <ul className="list-disc list-inside">
+            <h3 className="font-semibold mb-3">
+              Character Stats 
+              <span className="text-sm text-gray-400 ml-2">
+                ({character.statSystem === 'traditional' ? 'Traditional RPG' : 'SWTOR'})
+              </span>
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
               {Object.entries(character.stats).map(([key, val]) => (
-                <li key={key}>{key}: {val}</li>
+                <div key={key} className="bg-gray-700 rounded-lg p-3 text-center">
+                  <div className="text-sm text-gray-300 capitalize">
+                    {key === 'hitpoints' ? 'Hit Points' : key}
+                  </div>
+                  <div className="text-2xl font-bold text-white">
+                    {key === 'hitpoints' ? val : val}
+                    {key === 'hitpoints' && <span className="text-sm text-gray-400 ml-1">HP</span>}
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
       )}

@@ -1,0 +1,53 @@
+{
+  "forceSensitivity": [
+    "Non-Force User",
+    "Force Sensitive",
+    "Jedi",
+    "Sith",
+    "Gray Jedi"
+  ],
+  "lightsaberColors": [
+    "Blue",
+    "Green",
+    "Red",
+    "Purple",
+    "Yellow",
+    "Orange",
+    "White",
+    "Black",
+    "Cyan",
+    "Magenta"
+  ],
+  "forceAbilities": {
+    "Non-Force User": [],
+    "Force Sensitive": [
+      "Enhanced Intuition",
+      "Danger Sense",
+      "Limited Precognition"
+    ],
+    "Jedi": [
+      "Force Push/Pull",
+      "Mind Trick",
+      "Lightsaber Combat",
+      "Force Healing",
+      "Force Jump",
+      "Telepathy"
+    ],
+    "Sith": [
+      "Force Lightning",
+      "Force Choke",
+      "Lightsaber Combat",
+      "Force Drain",
+      "Force Fear",
+      "Battle Meditation"
+    ],
+    "Gray Jedi": [
+      "Force Push/Pull",
+      "Mind Trick",
+      "Lightsaber Combat",
+      "Force Lightning",
+      "Force Healing",
+      "Force Balance"
+    ]
+  }
+}

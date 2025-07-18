@@ -13,7 +13,7 @@ export default function Header() {
             <h1 className="text-xl font-bold text-white">ForceFoundry</h1>
           </div>
           
-          <nav className="flex space-x-1">
+          <nav className="flex items-center space-x-1">
             <Link href="/" className={`px-4 py-2 rounded-lg transition-colors ${
                 router.pathname === '/' 
                   ? 'bg-blue-600 text-white' 
@@ -27,6 +27,13 @@ export default function Header() {
                   : 'text-gray-300 hover:bg-gray-700 hover:text-white'
               }`}>
                 📝 Name Generator
+            </Link>
+            <Link href="/info" className={`ml-4 px-3 py-2 rounded-lg transition-colors ${
+                router.pathname === '/info' 
+                  ? 'bg-purple-600 text-white' 
+                  : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+              }`} title="App Information">
+                ℹ️
             </Link>
           </nav>
         </div>
