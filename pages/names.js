@@ -6,12 +6,8 @@ import femaleFirstNames from '../data/female_first_names.json';
 import femaleLastNames from '../data/female_last_names.json';
 import otherNamesNeutral from '../data/other_names_neutral.json';
 
-// Additional hyphenated surnames for variety
-const hyphenatedSurnames = [
-  'Solo-Skywalker', 'Jade-Solo', 'Antilles-Organa', 'Lars-Whitesun',
-  'Kenobi-Vos', 'Windu-Koon', 'Secura-Tano', 'Fett-Kryze',
-  'Calrissian-Bespin', 'Dameron-Wexley', 'Rey-Palpatine', 'Finn-Storm'
-];
+// Note: Removed hyphenatedSurnames array to prevent cross-species contamination
+// These mixed-species names like "Solo-Skywalker", "Calrissian-Bespin" don't belong to specific species
 
 // Get all available species from the data files
 const availableSpecies = Object.keys(maleFirstNames);
@@ -149,15 +145,10 @@ export default function Names() {
         // Standard name (First Last)
         finalName = `${firstName} ${lastName}`;
       }
-      
-      // Additional 10% chance for traditional hyphenated surname (overrides above if triggered)
-      // Only apply if species exists in all files OR if this is Crazy Mix mode
-      const useTraditionalHyphenated = Math.random() < 0.1;
-      if (useTraditionalHyphenated && nameType === 'standard' && (species === 'Crazy Mix' || speciesExistsInAllFiles)) {
-        const hyphenatedSurname = getRandom(hyphenatedSurnames);
-        finalName = `${firstName} ${hyphenatedSurname}`;
-        nameType = 'traditional-hyphenated';
-      }
+
+      // Note: Traditional hyphenated surnames disabled to prevent cross-species contamination
+      // The hyphenatedSurnames array contains mixed-species names like "Solo-Skywalker"
+      // which don't belong to any specific species
       
       newNames.push({
         id: i + 1,
