@@ -1,0 +1,119 @@
+{
+  "Human/Common": [
+    "Organa",
+    "Syndulla",
+    "Secura",
+    "Fenn",
+    "Aphra",
+    "Shand",
+    "Passik",
+    "Fortuna",
+    "Valotta",
+    "Bondara",
+    "Radeen",
+    "Utrila",
+    "Scott",
+    "Jared",
+    "Jace",
+    "Caleb",
+    "Gavin",
+    "Alexander",
+    "Kyle",
+    "Tristan"
+  ],
+  "Twi\u2019lek": [
+    "Freetaa",
+    "Freykaa",
+    "Rha",
+    "Passik",
+    "Gella",
+    "Nilim",
+    "Olan",
+    "Torr",
+    "Tualin",
+    "Secura",
+    "Shala",
+    "Vida",
+    "Ven",
+    "Vrei"
+  ],
+  "Rodian": [
+    "Vonapa",
+    "Baruk",
+    "Ropal",
+    "Annora",
+    "Purs",
+    "Banonawieedo",
+    "Bonkik"
+  ],
+  "Wookiee": [
+    "Deepgrowl",
+    "Silentshout",
+    "Bravepaw",
+    "Nightclaw",
+    "Gentleheart",
+    "Goldfur"
+  ],
+  "Chiss/Core-world": [
+    "Mitth'raw'nuruodo",
+    "Ar'alani",
+    "Zonk'alar",
+    "Hadaraj",
+    "Sabrak"
+  ],
+  "Mandalorian": [
+    "Wren",
+    "Kryze",
+    "Vizsla",
+    "Fenn",
+    "Shand",
+    "Onyo",
+    "Vel",
+    "Farr"
+  ],
+  "Mirialan": [
+    "Offee",
+    "Unduli",
+    "Yaleni",
+    "Syren",
+    "Tavira",
+    "Lirana",
+    "Elara",
+    "Mirin"
+  ],
+  "Cathar": [
+    "Khaara",
+    "Lira",
+    "Kassa",
+    "Sira",
+    "Mysa",
+    "Fayra",
+    "Lanna",
+    "Vira",
+    "Tara",
+    "Nyra"
+  ],
+  "Sith/Dark-Themed": [
+    "Sadow",
+    "Kressh",
+    "Ragnos",
+    "Naga",
+    "Vindican",
+    "Scourge",
+    "Legius",
+    "Minax",
+    "Bane",
+    "Plagueis",
+    "Darth",
+    "Serevin"
+  ],
+  "Nautolan": [
+    "Nabon",
+    "Reth",
+    "Solin",
+    "Trask",
+    "Veluun",
+    "Korran",
+    "Zhor"
+  ]
+}
