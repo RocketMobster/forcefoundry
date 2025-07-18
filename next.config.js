@@ -6,8 +6,8 @@ const nextConfig = {
     unoptimized: true
   },
   // GitHub Pages deployment configuration
-  basePath: process.env.NODE_ENV === 'production' ? '/forcefoundry' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/forcefoundry/' : '',
+  basePath: '/forcefoundry',
+  assetPrefix: '/forcefoundry/',
 }
 
 module.exports = nextConfig
