@@ -1,16 +1,134 @@
-\# ⚡ ForceFoundry
+# 🌌 ForceFoundry - Star Wars Character & Name Generator
 
+![Next.js](https://img.shields.io/badge/Built_with-Next.js-000?logo=next.js&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Styled_with-TailwindCSS-38bdf8?logo=tailwindcss&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![GitHub Pages](https://img.shields.io/badge/Deployed_on-GitHub_Pages-222?logo=github&logoColor=white)
 
+A comprehensive **Star Wars character and name generation tool** built with **Next.js** and **React**. Create authentic Star Wars characters with species-specific names, stats, and backgrounds.
 
-!\[Next.js](https://img.shields.io/badge/Built\_with-Next.js-000?logo=next.js\&logoColor=white)
+## 🚀 Live Demo
 
-!\[Tailwind CSS](https://img.shields.io/badge/Styled\_with-TailwindCSS-38bdf8?logo=tailwindcss\&logoColor=white)
+**[Visit ForceFoundry on GitHub Pages](https://rocketmobster.github.io/forcefoundry/)**
 
-!\[License](https://img.shields.io/badge/license-MIT-blue)
+## ✨ Features
 
+### 🎭 Character Generator
+- **Species-Specific Generation**: Choose from multiple Star Wars species or let it randomize
+- **Character Classes**: Jedi, Sith, Bounty Hunter, Smuggler with unique stats
+- **Comprehensive Details**: Names, alignment, homeworld, and character stats
+- **Download Characters**: Export generated characters as JSON files
 
+### 📝 Name Generator  
+- **Species-Specific Names**: Authentic names based on Star Wars species
+- **Multiple Generation Modes**:
+  - Random Mix: Random species combinations
+  - Specific Species: Choose exact species for generation
+  - Crazy Mix: Cross-species name combinations
+- **Name Variations**: Middle names, hyphenated names (when species data is complete)
+- **Bulk Generation**: Generate multiple names at once
 
-A \*\*Star Wars-themed character generator\*\* built with \*\*Next.js\*\* and \*\*Tailwind CSS\*\*. Randomly generates names, stats, alignments, species, planets, and AI-generated portraits using the SubnP API and SWAPI.
+### 🛡️ Robust Features
+- **Smart Fallback System**: Graceful handling of incomplete species data
+- **Error Prevention**: No cross-species contamination in names
+- **Responsive Design**: Works on desktop and mobile
+- **Offline Capable**: No external API dependencies
+
+## 🛠️ Local Development
+
+### Prerequisites
+- Node.js 18+
+- npm
+
+### Getting Started
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/RocketMobster/forcefoundry.git
+   cd forcefoundry
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open in browser**
+   Navigate to `http://localhost:3000`
+
+### Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build production version
+- `npm run start` - Start production server
+- `npm run export` - Export static files for deployment
+
+## 🔄 Deployment & Workflow
+
+### Branch Structure
+- **`main`** - Production branch (auto-deploys to GitHub Pages)
+- **`develop`** - Development branch for new features
+
+### Automatic Deployment
+- **GitHub Actions** automatically deploys to GitHub Pages on push to `main`
+- **Static Export** optimized for GitHub Pages hosting
+- **Build Process** includes dependency installation, building, and static export
+
+### Contributing Workflow
+1. Create feature branch from `develop`
+2. Make changes and test locally
+3. Create pull request to `develop`
+4. After review, merge to `develop`
+5. When ready for release, merge `develop` to `main`
+6. GitHub Actions will automatically deploy to GitHub Pages
+
+## 📊 Species Data
+
+The application uses species-specific JSON files for authentic name generation:
+
+- **Male/Female First Names**: Gender-specific first names by species
+- **Male/Female Last Names**: Gender-specific surnames by species  
+- **Neutral Names**: Used for middle names and name variations
+- **Smart Validation**: Only generates variations when species exists in all files
+
+## 🎨 Tech Stack
+
+- **Framework**: Next.js 15.4.1
+- **Frontend**: React with Hooks
+- **Styling**: Tailwind CSS
+- **Deployment**: GitHub Pages with GitHub Actions
+- **Data**: JSON files for species-specific names
+
+## 📈 Version History
+
+See [CHANGELOG.md](./CHANGELOG.md) for detailed version history and updates.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch from `develop`
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📝 License
+
+This project is for educational and entertainment purposes. Star Wars is a trademark of Lucasfilm Ltd.
+
+## 🌟 Acknowledgments
+
+- Inspired by the rich Star Wars universe
+- Built with modern web development best practices
+- Designed for authentic Star Wars character creation
+
+---
+
+**May the Force be with you!** ⭐
 
 
 
