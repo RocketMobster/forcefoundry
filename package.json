@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "next": "latest",
+    "node-fetch": "^3.3.2",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "replicate": "^1.0.1"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.14",

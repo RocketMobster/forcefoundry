@@ -1,4 +1,20 @@
-import { useState } from 'react';
+  // Reroll stats only, keeping all other character properties the same
+  const rerollStats = () => {
+    if (!character) return;
+    const { charClass, statSystem } = character;
+    const currentClasses = statSystems[statSystem];
+    const stats = Object.fromEntries(
+      Object.entries(currentClasses[charClass].stats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
+    );
+    // Add hitpoints for SWTOR system (endurance * 10)
+    if (statSystem === 'swtor' && stats.endurance) {
+      stats.hitpoints = stats.endurance * 10;
+    }
+    setCharacter({
+      ...character,
+      stats
+    });
+  };
 import Header from '../components/Header';
 import maleFirstNames from '../data/male_first_names.json';
 import maleLastNames from '../data/male_last_names.json';
@@ -15,12 +31,19 @@ const availableSpecies = Object.keys(maleFirstNames);
 // Local Star Wars data to avoid API dependency issues
 const starWarsSpecies = availableSpecies;
 
+import { useState, useEffect, useRef } from 'react';
+// ...existing code...
+
 export default function Home() {
+  // ...existing code...
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedSpecies, setSelectedSpecies] = useState('Random');
-  const [statSystem, setStatSystem] = useState('traditional'); // 'traditional' or 'swtor'
-  const [aiPortraitEnabled, setAiPortraitEnabled] = useState(false); // Toggle for AI portraits (disabled by default)
+  const [statSystem, setStatSystem] = useState('traditional');
+  const [aiPortraitEnabled, setAiPortraitEnabled] = useState(false);
+  const [pendingPortrait, setPendingPortrait] = useState(false); // Track if portrait should be generated after character creation
+  const [portraitError, setPortraitError] = useState(null); // Persist portrait error
+  const firstRender = useRef(true);
 
   const getRandom = (arr) => {
     if (!arr || arr.length === 0) return null;
@@ -58,161 +81,110 @@ export default function Home() {
       setLoading(true);
       const gender = randomizeAll ? getRandom(['male', 'female', 'other']) : character?.gender || 'male';
       const charClass = randomizeAll ? getRandom(Object.keys(statSystems[statSystem])) : character?.charClass || 'Jedi';
-
-      // Get the current stat system classes
       const currentClasses = statSystems[statSystem];
-
-    // Determine species
-    let characterSpecies;
-    if (randomizeAll || selectedSpecies === 'Random') {
-      characterSpecies = getRandom(starWarsSpecies);
-    } else {
-      characterSpecies = selectedSpecies;
-    }
-
-    // Check if the species exists in all required JSON files for name variations
-    const speciesExistsInAllFiles = (
-      (maleFirstNames[characterSpecies] && maleFirstNames[characterSpecies].length > 0) &&
-      (femaleFirstNames[characterSpecies] && femaleFirstNames[characterSpecies].length > 0) &&
-      (maleLastNames[characterSpecies] && maleLastNames[characterSpecies].length > 0) &&
-      (femaleLastNames[characterSpecies] && femaleLastNames[characterSpecies].length > 0) &&
-      (otherNamesNeutral[characterSpecies] && otherNamesNeutral[characterSpecies].length > 0)
-    );
-
-    // Generate names using species-specific data
-    let firstName, lastName;
-    if (gender === 'male') {
-      firstName = getNameFromSpecies(maleFirstNames, characterSpecies);
-      lastName = getNameFromSpecies(maleLastNames, characterSpecies);
-    } else if (gender === 'female') {
-      firstName = getNameFromSpecies(femaleFirstNames, characterSpecies);
-      lastName = getNameFromSpecies(femaleLastNames, characterSpecies);
-    } else {
-      // For 'other' gender, randomly pick from either male or female first names
-      const nameData = Math.random() < 0.5 ? maleFirstNames : femaleFirstNames;
-      const lastNameData = Math.random() < 0.5 ? maleLastNames : femaleLastNames;
-      firstName = getNameFromSpecies(nameData, characterSpecies);
-      lastName = getNameFromSpecies(lastNameData, characterSpecies);
-    }
-
-    // Simple name generation (no middle names or hyphenation unless species exists in all files)
-    let finalName = `${firstName} ${lastName}`;
-
-    // Only add variations if species exists in all files (same logic as name generator)
-    if (speciesExistsInAllFiles) {
-      const neutralNames = otherNamesNeutral[characterSpecies] || [];
-      const variationChance = Math.random();
-      
-      if (variationChance < 0.05 && neutralNames.length > 0) {
-        // 5% chance: Middle name for character generator
-        const middleName = getRandom(neutralNames);
-        finalName = `${firstName} ${middleName} ${lastName}`;
-      }
-    }
-
-    const alignment = getRandom(alignments);
-    const homeworld = getStarWarsData('planets');
-
-    // AI Portrait Generation with SubNP API (optional)
-    let imageUrl = null;
-    let imageError = null;
-    
-    if (aiPortraitEnabled) {
-      // Use local API route to avoid CORS and keep key secret
-      setTimeout(() => {
-        const prompt = `${gender} ${characterSpecies} ${charClass} from Star Wars, portrait style, detailed face, ${alignment} alignment, professional character art`;
-        fetch('/api/replicate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt })
-        })
-          .then(async (res) => {
-            if (!res.ok) {
-              const errorText = await res.text();
-              setCharacter(prev => prev ? {
-                ...prev,
-                image: null,
-                imageError: `API Error: ${res.status} - ${res.statusText}: ${errorText}`
-              } : prev);
-              return;
-            }
-            const data = await res.json();
-            setCharacter(prev => prev ? {
-              ...prev,
-              image: data.imageUrl,
-              imageError: null
-            } : prev);
-          })
-          .catch((error) => {
-            setCharacter(prev => prev ? {
-              ...prev,
-              image: null,
-              imageError: error.message || 'Unknown error'
-            } : prev);
-          });
-      }, 100);
-    }
-
-    const stats = Object.fromEntries(
-      Object.entries(currentClasses[charClass].stats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
-    );
-
-    // Add hitpoints for SWTOR system (endurance * 10)
-    if (statSystem === 'swtor' && stats.endurance) {
-      stats.hitpoints = stats.endurance * 10;
-    }
-
-    // Force System Integration
-    let forceSensitivity, lightsaberColor, forceAbilities;
-    
-    if (charClass === 'Jedi') {
-      forceSensitivity = 'Jedi';
-    } else if (charClass === 'Sith') {
-      forceSensitivity = 'Sith';
-    } else {
-      // For other classes, random chance of Force sensitivity
-      const forceChance = Math.random();
-      if (forceChance < 0.05) {
-        forceSensitivity = 'Gray Jedi';
-      } else if (forceChance < 0.15) {
-        forceSensitivity = 'Force Sensitive';
+      let characterSpecies;
+      if (randomizeAll || selectedSpecies === 'Random') {
+        characterSpecies = getRandom(starWarsSpecies);
       } else {
-        forceSensitivity = 'Non-Force User';
+        characterSpecies = selectedSpecies;
       }
+      const speciesExistsInAllFiles = (
+        (maleFirstNames[characterSpecies] && maleFirstNames[characterSpecies].length > 0) &&
+        (femaleFirstNames[characterSpecies] && femaleFirstNames[characterSpecies].length > 0) &&
+        (maleLastNames[characterSpecies] && maleLastNames[characterSpecies].length > 0) &&
+        (femaleLastNames[characterSpecies] && femaleLastNames[characterSpecies].length > 0) &&
+        (otherNamesNeutral[characterSpecies] && otherNamesNeutral[characterSpecies].length > 0)
+      );
+      let firstName, lastName;
+      if (gender === 'male') {
+        firstName = getNameFromSpecies(maleFirstNames, characterSpecies);
+        lastName = getNameFromSpecies(maleLastNames, characterSpecies);
+      } else if (gender === 'female') {
+        firstName = getNameFromSpecies(femaleFirstNames, characterSpecies);
+        lastName = getNameFromSpecies(femaleLastNames, characterSpecies);
+      } else {
+        const nameData = Math.random() < 0.5 ? maleFirstNames : femaleFirstNames;
+        const lastNameData = Math.random() < 0.5 ? maleLastNames : femaleLastNames;
+        firstName = getNameFromSpecies(nameData, characterSpecies);
+        lastName = getNameFromSpecies(lastNameData, characterSpecies);
+      }
+      let finalName = `${firstName} ${lastName}`;
+      if (speciesExistsInAllFiles) {
+        const neutralNames = otherNamesNeutral[characterSpecies] || [];
+        const variationChance = Math.random();
+        if (variationChance < 0.05 && neutralNames.length > 0) {
+          const middleName = getRandom(neutralNames);
+          finalName = `${firstName} ${middleName} ${lastName}`;
+        }
+      }
+      const alignment = getRandom(alignments);
+      const homeworld = getStarWarsData('planets');
+      let imageUrl = null;
+      let imageError = null;
+      const stats = Object.fromEntries(
+        Object.entries(currentClasses[charClass].stats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
+      );
+      if (statSystem === 'swtor' && stats.endurance) {
+        stats.hitpoints = stats.endurance * 10;
+      }
+      let forceSensitivity, lightsaberColor, forceAbilities;
+      if (charClass === 'Jedi') {
+        forceSensitivity = 'Jedi';
+      } else if (charClass === 'Sith') {
+        forceSensitivity = 'Sith';
+      } else {
+        const forceChance = Math.random();
+        if (forceChance < 0.05) {
+          forceSensitivity = 'Gray Jedi';
+        } else if (forceChance < 0.15) {
+          forceSensitivity = 'Force Sensitive';
+        } else {
+          forceSensitivity = 'Non-Force User';
+        }
+      }
+      if (forceSensitivity !== 'Non-Force User' && forceSensitivity !== 'Force Sensitive') {
+        lightsaberColor = getRandom(forceSystem.lightsaberColors);
+      }
+      forceAbilities = forceSystem.forceAbilities[forceSensitivity] || [];
+      setCharacter({
+        name: finalName,
+        gender,
+        charClass,
+        alignment,
+        species: characterSpecies,
+        homeworld,
+        image: imageUrl,
+        imageError,
+        stats,
+        icon: currentClasses[charClass].icon,
+        forceSensitivity,
+        lightsaberColor,
+        forceAbilities,
+        statSystem
+      });
+      setLoading(false);
+      // If AI portrait is enabled, trigger portrait generation after character is set
+      if (aiPortraitEnabled) {
+        setPendingPortrait(true);
+      }
+    } catch (error) {
+      console.error('Error generating character:', error);
+      setLoading(false);
+      alert('Failed to generate character. Please try again.');
     }
-
-    // Generate lightsaber color for Force users
-    if (forceSensitivity !== 'Non-Force User' && forceSensitivity !== 'Force Sensitive') {
-      lightsaberColor = getRandom(forceSystem.lightsaberColors);
-    }
-
-    // Get Force abilities
-    forceAbilities = forceSystem.forceAbilities[forceSensitivity] || [];
-
-    setCharacter({
-      name: finalName,
-      gender,
-      charClass,
-      alignment,
-      species: characterSpecies,
-      homeworld,
-      image: imageUrl,
-      imageError,
-      stats,
-      icon: currentClasses[charClass].icon,
-      forceSensitivity,
-      lightsaberColor,
-      forceAbilities,
-      statSystem
-    });
-    setLoading(false);
-  } catch (error) {
-    console.error('Error generating character:', error);
-    setLoading(false);
-    // Show error to user but don't crash the app
-    alert('Failed to generate character. Please try again.');
-  }
   };
+  // Automatically generate portrait after character creation if needed
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    if (pendingPortrait && character && aiPortraitEnabled) {
+      setPendingPortrait(false);
+      generateNewPortrait();
+    }
+    // eslint-disable-next-line
+  }, [character, pendingPortrait, aiPortraitEnabled]);
 
   const downloadJSON = () => {
     const blob = new Blob([JSON.stringify(character, null, 2)], { type: 'application/json' });
@@ -278,8 +250,17 @@ export default function Home() {
 
   const generateNewPortrait = async () => {
     if (!character) return;
-    try {
-      setLoading(true);
+    setPortraitError(null); // Clear error at start
+    setLoading(true);
+    let didTimeout = false;
+    // Timeout after 40 seconds
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => {
+        didTimeout = true;
+        reject(new Error('Portrait generation timed out. The Replicate API may be slow or unavailable.'));
+      }, 40000)
+    );
+    const fetchPortrait = async () => {
       let imageUrl = null;
       let imageError = null;
       const prompt = `${character.gender} ${character.species} ${character.charClass} from Star Wars, portrait style, detailed face, ${character.alignment} alignment, professional character art`;
@@ -289,25 +270,44 @@ export default function Home() {
         body: JSON.stringify({ prompt })
       });
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`API Error: ${res.status} - ${res.statusText}: ${errorText}`);
+        let errorText;
+        let rawOutput = null;
+        try {
+          const data = await res.json();
+          errorText = data.error || JSON.stringify(data);
+          rawOutput = data.rawOutput;
+        } catch (e) {
+          errorText = await res.text();
+        }
+        throw new Error(`API Error: ${res.status} - ${res.statusText}: ${errorText}${rawOutput ? `\nRaw Output: ${JSON.stringify(rawOutput)}` : ''}`);
       }
       const data = await res.json();
       imageUrl = data.imageUrl;
-      setCharacter({
-        ...character,
+      if (typeof imageUrl !== 'string' || !imageUrl.startsWith('http')) {
+        throw new Error(`Portrait API did not return a valid image URL.\nReturned: ${JSON.stringify(imageUrl)}\nRaw Output: ${JSON.stringify(data.rawOutput)}`);
+      }
+      setCharacter(prev => prev ? {
+        ...prev,
         image: imageUrl,
         imageError: null
-      });
+      } : prev);
+      setPortraitError(null);
+    };
+    try {
+      await Promise.race([fetchPortrait(), timeoutPromise]);
       setLoading(false);
     } catch (error) {
-      console.error('Error generating new portrait:', error);
       setLoading(false);
-      setCharacter({
-        ...character,
-        image: null,
-        imageError: error.message || 'Unknown error'
+      console.error('Portrait generation error:', error.message || error);
+      setCharacter(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          image: null,
+          imageError: error.message || 'Unknown error'
+        };
       });
+      setPortraitError(error.message || 'Unknown error');
     }
   };
 
@@ -390,7 +390,7 @@ export default function Home() {
         <button
           onClick={() => generateCharacter(false)}
           className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded flex items-center gap-2"
-          title={character ? `Generate another ${character.gender} ${character.charClass}` : "Generate a Male Jedi"}
+          title={character ? `Generate another ${character.gender} ${character.charClass} (keeps current species and settings)` : "Generate a Male Jedi"}
         >
           <span>🔄</span>
           {character ? "Same Type" : "Generate Character"}
@@ -398,11 +398,21 @@ export default function Home() {
         <button
           onClick={() => generateCharacter(true)}
           className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded flex items-center gap-2"
-          title="Randomize everything: gender, class, and all attributes"
+          title="Randomizes everything: gender, class, species, and all attributes. Use this to start completely fresh."
         >
           <span>🎲</span>
-          New Character
+          New Character (Full Random)
         </button>
+        {character && (
+          <button
+            onClick={rerollStats}
+            className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded flex items-center gap-2"
+            title="Reroll stats only (keep name, species, class, portrait, etc.)"
+          >
+            <span>🧮</span>
+            Reroll Stats
+          </button>
+        )}
         {character && (
           <>
             <button
@@ -452,12 +462,34 @@ export default function Home() {
       </div>
 
       {loading && (
-        <div className="text-center">
-          <div className="text-lg mb-2">Generating character...</div>
-          <div className="text-sm text-gray-400">Creating AI portrait and character data</div>
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-opacity-50 mb-6"></div>
+          <div className="text-2xl font-bold mb-2 text-white">Generating portrait...</div>
+          <div className="text-sm text-gray-300 mb-2">This may take up to 30 seconds. Please wait.</div>
+          <div className="text-xs text-gray-400">If this takes too long or fails, try again or check your API key.</div>
         </div>
       )}
 
+      {/* Always show portrait error at the top if present */}
+      {portraitError && !loading && (
+        <div className="max-w-xl mx-auto bg-gray-900 rounded-xl p-4 shadow-md border border-red-500 mb-6">
+          <div className="text-center">
+            <div className="text-red-400 text-xs mb-1 font-bold">Portrait generation failed:</div>
+            <div className="text-red-300 text-xs whitespace-pre-wrap break-all" style={{ maxWidth: '32rem', margin: '0 auto' }}>{portraitError}</div>
+            <button
+              className="mt-2 px-2 py-1 bg-gray-700 text-xs text-gray-200 rounded hover:bg-gray-600 border border-gray-500"
+              onClick={() => {
+                navigator.clipboard.writeText(portraitError);
+              }}
+            >Copy Error</button>
+            {aiPortraitEnabled && (
+              <div className="text-yellow-400 text-xs mt-1">
+                Try the "🖼️ New Portrait" button or disable AI portraits
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {character && !loading && (
         <div className="max-w-xl mx-auto bg-gray-800 rounded-xl p-6 shadow-md">
           <div className="w-full h-64 bg-gray-700 rounded mb-4 flex items-center justify-center overflow-hidden">
@@ -465,7 +497,8 @@ export default function Home() {
               <img 
                 src={character.image} 
                 alt={`${character.name} portrait`}
-                className="w-full h-full object-cover"
+                className="w-64 h-64 object-cover rounded mx-auto"
+                style={{ aspectRatio: '1 / 1', width: '16rem', height: '16rem', maxWidth: '100%', maxHeight: '100%' }}
                 onError={(e) => {
                   // Fallback to character icon if image fails to load
                   e.target.style.display = 'none';
@@ -479,19 +512,7 @@ export default function Home() {
                 <div className="text-6xl mb-4">{character.icon}</div>
                 <div className="text-lg font-semibold text-white">{character.charClass}</div>
                 <div className="text-sm text-gray-300">
-                  {character.imageError ? (
-                    <div className="text-center">
-                      <div className="text-red-400 text-xs mb-1">Portrait generation failed:</div>
-                      <div className="text-red-300 text-xs">{character.imageError}</div>
-                      {aiPortraitEnabled && (
-                        <div className="text-yellow-400 text-xs mt-1">
-                          Try the "🖼️ New Portrait" button or disable AI portraits
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    'Character Portrait'
-                  )}
+                  {'Character Portrait'}
                 </div>
               </div>
             </div>

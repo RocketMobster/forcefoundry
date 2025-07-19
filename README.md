@@ -1,3 +1,10 @@
+# ⚠️ Known Issues
+
+**AI Image Generation (Replicate API) is currently broken:**
+- Official Replicate models (e.g., google/imagen-4-fast, minimax/image-01) require a version hash for the HTTP API, but do not publish it.
+- The Replicate Node.js client returns empty output for these models, even though the playground works.
+- This is a Replicate-side issue; we are awaiting support for resolution.
+
 # 🌌 ForceFoundry - Star Wars Character & Name Generator
 
 ![Next.js](https://img.shields.io/badge/Built_with-Next.js-000?logo=next.js&logoColor=white)
