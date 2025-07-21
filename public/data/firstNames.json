@@ -1,0 +1,5 @@
+{
+  "male": ["Luke", "Han", "Anakin", "Obi-Wan", "Mace"],
+  "female": ["Leia", "Padmé", "Rey", "Ahsoka", "Jyn"],
+  "other": ["Zorii", "Max", "Dak", "Riyo", "Bazine"]
+}

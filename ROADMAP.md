@@ -89,9 +89,51 @@
   - [ ] Include character portrait, stats, and background
   - [ ] Add print preview functionality
 
+### � **Name Generation Enhancements**
+- [x] **Advanced Crazy Mode**
+  - [x] Implement 3-part cross-species names (30% of crazy mode names)
+  - [x] Add "2-part" vs "3-part" cross-species chaos indicators
+  - [x] Enhanced species tracking and compilation
+  - [x] Improved species display in multi-species names
+
+- [x] **Name Structure Improvements**
+  - [x] Adjust name structure frequencies for more natural results
+  - [x] Increase standard first-last names from 5% to 22%
+  - [x] Multiple structure detection for complex names
+  - [x] Multiple structure pills with unique styling
+
+- [x] **Canon & Famous Name System**
+  - [x] Implement Famous Family classification with silver/grey styling
+  - [x] Add species-aware canon name organization
+  - [x] Implement canon name frequency scaling by batch size
+  - [x] Add duplicate prevention with improved tracking
+  - [x] Remove canon characters from Crazy Mode
+
+### �🐛 **Bug Fixes & Enhancements**
+- [x] **Name Generation Issues**
+  - [x] Fix Twi'lek name display issues with Unicode apostrophes
+  - [x] Fix cross-species name contamination in specific mode
+  - [x] Fix variable scope issues in name generation
+  - [x] Add comprehensive error handling and fallbacks
+  - [x] Enhance cross-species chaos pill styling
+
+- [x] **Data Expansion**
+  - [x] Add 16 missing species to name dictionaries:
+    - [x] Bothan, Trandoshan, Mon Calamari, Ewok, Gungan
+    - [x] Hutt, Jawa, Ithorian, Kel Dor, Rodian
+    - [x] Sullustan, Ugnaught, Weequay, Wookiee
+    - [x] Zabrak, Dathomirian
+  - [x] Consolidate gender-specific last name files
+  - [x] Restructure canon_names.json by species
+
+- [x] **Character Generator Fixes**
+  - [x] Fix planet name display showing "Unknown"
+  - [x] Fix layout issues with character display card
+  - [x] Improve responsive design for various screens
+
 ---
 
-## 🚀 Medium-Term Goals (v2.2.0)
+## 🚀 Medium-Term Goals (v2.3.0)
 
 ### 🌟 **Advanced Features**
 - [ ] **Character Backstory Generator**

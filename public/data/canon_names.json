@@ -1,0 +1,111 @@
+{
+  "Human/Common": [
+    "Luke Skywalker",
+    "Leia Organa",
+    "Han Solo",
+    "Rey Skywalker",
+    "Anakin Skywalker",
+    "Padmé Amidala",
+    "Cassian Andor",
+    "Jyn Erso",
+    "Lando Calrissian",
+    "Ben Solo",
+    "Kylo Ren",
+    "Poe Dameron",
+    "Bail Organa",
+    "Wedge Antilles",
+    "Finn Dameron",
+    "Cara Dune",
+    "Rose Tico",
+    "Obi-Wan Kenobi",
+    "Mace Windu",
+    "Qui-Gon Jinn"
+  ],
+  "Twi'lek": [
+    "Hera Syndulla"
+  ],
+  "Togruta": [
+    "Ahsoka Tano"
+  ],
+  "Chiss": [
+    "Thrawn Mitth'raw'nuruodo"
+  ],
+  "Mandalorian/Human/Common": [
+    "Sabine Wren",
+    "Bo-Katan Kryze",
+    "Din Djarin",
+    "Boba Fett",
+    "Jango Fett"
+  ],
+  "Unknown": [
+    "Grogu Tano"
+  ],
+  "Zabrak": [
+    "Darth Maul"
+  ],
+  "Wookiee": [
+    "Chewbacca",
+    "Tarfful"
+  ],
+  "Nautolan": [
+    "Kit Fisto"
+  ],
+  "Bothan": [],
+  "Trandoshan": [
+    "Bossk"
+  ],
+  "Mon Calamari": [
+    "Admiral Ackbar",
+    "Admiral Raddus"
+  ],
+  "Gungan": [
+    "Jar Jar Binks",
+    "Captain Tarpals",
+    "Boss Nass"
+  ],
+  "Hutt": [
+    "Jabba the Hutt",
+    "Gardulla the Hutt",
+    "Ziro the Hutt"
+  ],
+  "Kel Dor": [
+    "Plo Koon"
+  ],
+  "Sullustan": [
+    "Nien Nunb"
+  ],
+  "Ewok": [
+    "Wicket Warrick",
+    "Chief Chirpa",
+    "Logray"
+  ],
+  "Ithorian": [
+    "Momaw Nadon"
+  ],
+  "Quarren": [],
+  "Cerean": [
+    "Ki-Adi-Mundi"
+  ],
+  "Devaronian": [],
+  "Kaleesh": [
+    "General Grievous"
+  ],
+  "Geonosian": [
+    "Poggle the Lesser"
+  ],
+  "Lasat": [
+    "Garazeb Orrelios"
+  ],
+  "Dathomirian": [
+    "Asajj Ventress"
+  ],
+  "Mirialan": [
+    "Barriss Offee",
+    "Luminara Unduli"
+  ],
+  "FamousFamily": [
+    "* Skywalker",
+    "* Solo",
+    "* Organa"
+  ]
+}

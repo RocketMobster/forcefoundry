@@ -5,6 +5,67 @@ All notable changes to ForceFoundry will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-07-21
+
+### 🚀 Major Enhancements
+
+#### Name Generation System
+- **NEW**: Enhanced 3-part cross-species names in Crazy Mode (30% of generated names)
+- **NEW**: Improved cross-species chaos indicators showing "2-part" or "3-part" species combinations
+- **IMPROVED**: Name structure frequency adjustments:
+  - Standard first-last names increased from 5% to 22%
+  - Each variation type slightly reduced from 10% to 8%
+- **ENHANCED**: Comprehensive species tracking across all name generation modes
+- **IMPROVED**: Multiple name structure detection and display:
+  - Simultaneous tracking of middle names and hyphenated components
+  - Multiple structure pills with unique styling and icons
+  - Proper display for complex names like "Temmin Xal Dameron-Dran"
+
+#### Canon & Famous Names
+- **NEW**: Famous Family name classification with unique silver/grey styling
+- **IMPROVED**: Case-insensitive canon name detection with 5% generation chance
+- **ENHANCED**: Species-aware canon name organization in data structure
+- **NEW**: Canon name frequency scaling based on batch size
+- **FIXED**: Canon name duplication prevention with improved tracking
+- **IMPROVED**: Canon characters removed entirely from Crazy Mode
+
+### 🔧 Bug Fixes & Improvements
+
+#### Name Generation System
+- **FIXED**: Twi'lek name display issues caused by inconsistent Unicode apostrophes
+- **FIXED**: Cross-species name contamination when using specific species selection
+- **FIXED**: Variable scope issues in name generation logic
+- **FIXED**: Runtime error in "crazy mode" due to variable initialization
+- **IMPROVED**: Enhanced cross-species chaos pill styling with custom gradients
+- **ENHANCED**: Comprehensive error handling and fallbacks
+
+#### Data Expansion
+- **NEW**: Added 16 missing species to all name dictionaries with culturally appropriate names:
+  - Bothan
+  - Trandoshan
+  - Mon Calamari
+  - Ewok
+  - Gungan
+  - Hutt
+  - Jawa
+  - Ithorian
+  - Kel Dor
+  - Rodian
+  - Sullustan
+  - Ugnaught
+  - Weequay
+  - Wookiee
+  - Zabrak
+  - Dathomirian
+- **IMPROVED**: Consolidated gender-specific last name files for better maintenance
+
+#### Character Generator
+- **FIXED**: Planet name display showing "Unknown" instead of actual planet names
+- **FIXED**: Layout issues with character display card being cut off
+- **IMPROVED**: Better responsive design for various screen sizes
+
+## [2.1.0] - 2025-07-18
+
 ## [2.0.0] - 2025-07-18
 
 ### 🚀 Major Features Added

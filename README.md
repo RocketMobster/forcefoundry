@@ -11,6 +11,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Styled_with-TailwindCSS-38bdf8?logo=tailwindcss&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![GitHub Pages](https://img.shields.io/badge/Deployed_on-GitHub_Pages-222?logo=github&logoColor=white)
+![Version](https://img.shields.io/badge/version-v2.2.0-brightgreen)
 
 A comprehensive **Star Wars character and name generation tool** built with **Next.js** and **React**. Create authentic Star Wars characters with species-specific names, stats, and backgrounds.
 
@@ -28,6 +29,9 @@ A comprehensive **Star Wars character and name generation tool** built with **Ne
 
 ### 📝 Name Generator  
 - **Species-Specific Names**: Authentic names based on Star Wars species
+- **Multiple Generation Modes**: Standard, Species-Specific, and Cross-Species Crazy
+- **Advanced Features**: 2-part and 3-part cross-species combinations
+- **Canon & Famous Names**: Special highlighting for canonical Star Wars characters
 - **Multiple Generation Modes**:
   - Random Mix: Random species combinations
   - Specific Species: Choose exact species for generation

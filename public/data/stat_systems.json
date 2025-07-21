@@ -1,0 +1,90 @@
+{
+  "traditional": {
+    "Jedi": {
+      "stats": {
+        "strength": 6,
+        "agility": 8,
+        "intellect": 7,
+        "wisdom": 8,
+        "charisma": 7,
+        "constitution": 6
+      },
+      "icon": "🧘"
+    },
+    "Sith": {
+      "stats": {
+        "strength": 8,
+        "agility": 7,
+        "intellect": 6,
+        "wisdom": 5,
+        "charisma": 8,
+        "constitution": 7
+      },
+      "icon": "⚡"
+    },
+    "BountyHunter": {
+      "stats": {
+        "strength": 7,
+        "agility": 9,
+        "intellect": 5,
+        "wisdom": 6,
+        "charisma": 4,
+        "constitution": 8
+      },
+      "icon": "🎯"
+    },
+    "Smuggler": {
+      "stats": {
+        "strength": 5,
+        "agility": 7,
+        "intellect": 8,
+        "wisdom": 6,
+        "charisma": 9,
+        "constitution": 6
+      },
+      "icon": "🚀"
+    }
+  },
+  "swtor": {
+    "Jedi": {
+      "stats": {
+        "strength": 6,
+        "endurance": 6,
+        "aim": 5,
+        "cunning": 7,
+        "willpower": 8
+      },
+      "icon": "🧘"
+    },
+    "Sith": {
+      "stats": {
+        "strength": 8,
+        "endurance": 7,
+        "aim": 6,
+        "cunning": 6,
+        "willpower": 8
+      },
+      "icon": "⚡"
+    },
+    "BountyHunter": {
+      "stats": {
+        "strength": 7,
+        "endurance": 8,
+        "aim": 9,
+        "cunning": 5,
+        "willpower": 6
+      },
+      "icon": "🎯"
+    },
+    "Smuggler": {
+      "stats": {
+        "strength": 5,
+        "endurance": 6,
+        "aim": 7,
+        "cunning": 8,
+        "willpower": 6
+      },
+      "icon": "🚀"
+    }
+  }
+}

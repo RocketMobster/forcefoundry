@@ -1,0 +1,46 @@
+{
+  "Jedi": {
+    "stats": {
+      "strength": 6,
+      "agility": 8,
+      "intellect": 7,
+      "wisdom": 8,
+      "charisma": 7,
+      "constitution": 6
+    },
+    "icon": "🧘"
+  },
+  "Sith": {
+    "stats": {
+      "strength": 8,
+      "agility": 7,
+      "intellect": 6,
+      "wisdom": 5,
+      "charisma": 8,
+      "constitution": 7
+    },
+    "icon": "⚡"
+  },
+  "BountyHunter": {
+    "stats": {
+      "strength": 7,
+      "agility": 9,
+      "intellect": 5,
+      "wisdom": 6,
+      "charisma": 4,
+      "constitution": 8
+    },
+    "icon": "🎯"
+  },
+  "Smuggler": {
+    "stats": {
+      "strength": 5,
+      "agility": 7,
+      "intellect": 8,
+      "wisdom": 6,
+      "charisma": 9,
+      "constitution": 6
+    },
+    "icon": "🚀"
+  }
+}
