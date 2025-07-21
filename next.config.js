@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Add any Vercel/Next.js config here if needed
+  output: 'export',
+  basePath: process.env.NODE_ENV === 'production' ? '/forcefoundry' : '',
+  images: {
+    unoptimized: true
+  },
+  trailingSlash: true
 }
 
 module.exports = nextConfig

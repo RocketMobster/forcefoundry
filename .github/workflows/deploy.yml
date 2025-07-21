@@ -34,8 +34,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Build Next.js app
-        run: npm run build
+      - name: Build and Export Next.js app
+        run: npm run deploy
+        env:
+          NEXT_PUBLIC_REPLICATE_API_TOKEN: "${{ secrets.NEXT_PUBLIC_REPLICATE_API_TOKEN }}"
         
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
