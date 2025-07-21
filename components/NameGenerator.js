@@ -13,7 +13,40 @@ export default function NameGenerator() {
   const [infoBoxVisible, setInfoBoxVisible] = useState(false);
   const [randomInfoBoxVisible, setRandomInfoBoxVisible] = useState(false);
   const [usedCanonNames, setUsedCanonNames] = useState([]);
+  const [canonGenderMap, setCanonGenderMap] = useState({});
   
+  // Load canon gender mapping
+  useEffect(() => {
+    const loadCanonGenders = async () => {
+      try {
+        const res = await fetch(getResourceUrl('/data/canon_genders.json'));
+        if (!res.ok) {
+          console.error(`Failed to load canon genders: ${res.status} ${res.statusText}`);
+          return;
+        }
+        
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error(`Expected JSON but got ${contentType} for canon genders`);
+          return;
+        }
+        
+        try {
+          const text = await res.text();
+          const data = JSON.parse(text);
+          console.log("Loaded canon gender mapping:", data);
+          setCanonGenderMap(data);
+        } catch (err) {
+          console.error("Error parsing canon genders JSON:", err);
+        }
+      } catch (err) {
+        console.error("Error loading canon genders data:", err);
+      }
+    };
+    
+    loadCanonGenders();
+  }, []);
+
   // Load species options on component mount
   useEffect(() => {
     const loadSpecies = async () => {
@@ -190,6 +223,15 @@ export default function NameGenerator() {
         // Filter out already used canon names to prevent duplicates (use both global and local tracking)
         availableCanonNames = availableCanonNames.filter(name => !localUsedCanonNames.includes(name));
         
+        // Filter for gender-appropriate canon names
+        if (Object.keys(canonGenderMap).length > 0) {
+          availableCanonNames = availableCanonNames.filter(name => {
+            const nameGender = canonGenderMap[name];
+            // Keep names that match the current gender or have no gender specified (neutral)
+            return !nameGender || nameGender === 'neutral' || nameGender === currentGender;
+          });
+        }
+        
         // Reduce canon name chance for large quantity generations to avoid overrepresentation
         // Scale canon chance inversely with quantity: 5% for small batches, down to 1% for large batches
         const canonChanceScaling = Math.max(0.01, Math.min(0.05, 0.05 * (20 / Math.max(20, quantity))));
@@ -306,6 +348,15 @@ export default function NameGenerator() {
             
             // Filter out already used canon names
             randomSpeciesCanonNames = randomSpeciesCanonNames.filter(name => !usedCanonNames.includes(name));
+            
+            // Filter for gender-appropriate canon names
+            if (Object.keys(canonGenderMap).length > 0) {
+              randomSpeciesCanonNames = randomSpeciesCanonNames.filter(name => {
+                const nameGender = canonGenderMap[name];
+                // Keep names that match the current gender or have no gender specified (neutral)
+                return !nameGender || nameGender === 'neutral' || nameGender === currentGender;
+              });
+            }
           }
           
           // 5% chance to use a canon name if available, never in crazy mode

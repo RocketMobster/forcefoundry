@@ -1,0 +1,65 @@
+{
+  "Luke Skywalker": "male",
+  "Leia Organa": "female",
+  "Han Solo": "male",
+  "Rey Skywalker": "female",
+  "Anakin Skywalker": "male",
+  "Padmé Amidala": "female",
+  "Cassian Andor": "male",
+  "Jyn Erso": "female",
+  "Lando Calrissian": "male",
+  "Ben Solo": "male",
+  "Kylo Ren": "male",
+  "Poe Dameron": "male",
+  "Bail Organa": "male",
+  "Wedge Antilles": "male",
+  "Finn Dameron": "male",
+  "Cara Dune": "female",
+  "Rose Tico": "female",
+  "Obi-Wan Kenobi": "male",
+  "Mace Windu": "male",
+  "Qui-Gon Jinn": "male",
+  
+  "Hera Syndulla": "female",
+  "Ahsoka Tano": "female",
+  "Thrawn Mitth'raw'nuruodo": "male",
+  
+  "Sabine Wren": "female",
+  "Bo-Katan Kryze": "female",
+  "Din Djarin": "male",
+  "Boba Fett": "male",
+  "Jango Fett": "male",
+  
+  "Grogu Tano": "male",
+  "Darth Maul": "male",
+  
+  "Chewbacca": "male",
+  "Tarfful": "male",
+  
+  "Kit Fisto": "male",
+  
+  "Cad Bane": "male",
+  
+  "Admiral Ackbar": "male",
+  
+  "C-3PO": "male",
+  "R2-D2": "male",
+  "BB-8": "neutral",
+  "K-2SO": "male",
+  "IG-11": "male",
+  
+  "Darth Vader": "male",
+  "Sheev Palpatine": "male",
+  "Count Dooku": "male",
+  "General Grievous": "male",
+  "Wilhuff Tarkin": "male",
+  "Orson Krennic": "male",
+  "Galen Erso": "male",
+  
+  "Jabba": "male",
+  
+  "Jar Jar Binks": "male",
+  
+  "Cere Junda": "female",
+  "Cal Kestis": "male"
+}
