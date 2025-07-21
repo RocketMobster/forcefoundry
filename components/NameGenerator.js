@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import canonNamesData from '../data/canon_names.json';
+import { getResourceUrl } from '../utils/paths';
 
 export default function NameGenerator() {
   // State variables
@@ -17,7 +18,8 @@ export default function NameGenerator() {
   useEffect(() => {
     const loadSpecies = async () => {
       try {
-        const res = await fetch('/data/species.json');
+        // Use the utility function for correct path handling
+        const res = await fetch(getResourceUrl('/data/species.json'));
         
         if (!res.ok) {
           console.error(`Failed to load species data: ${res.status} ${res.statusText}`);
@@ -111,6 +113,7 @@ export default function NameGenerator() {
       const safeJsonFetch = async (url) => {
         try {
           console.log(`Fetching data from ${url}...`);
+          // URL already includes the correct base path from getResourceUrl
           const res = await fetch(url);
           if (!res.ok) {
             console.error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
@@ -141,10 +144,10 @@ export default function NameGenerator() {
       // Load all name data files with better error handling
       // Note: Ensure these paths match your file system structure - using the combined last_names file instead of gender-specific ones
       const [maleFirst, femaleFirst, lastNames, neutral] = await Promise.all([
-        safeJsonFetch('/data/male_first_names.json'),
-        safeJsonFetch('/data/female_first_names.json'),
-        safeJsonFetch('/data/last_names.json'),
-        safeJsonFetch('/data/other_names_neutral.json')
+        safeJsonFetch(getResourceUrl('/data/male_first_names.json')),
+        safeJsonFetch(getResourceUrl('/data/female_first_names.json')),
+        safeJsonFetch(getResourceUrl('/data/last_names.json')),
+        safeJsonFetch(getResourceUrl('/data/other_names_neutral.json'))
       ]);
       
       const newNames = [];

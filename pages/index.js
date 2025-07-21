@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import { getResourceUrl } from '../utils/paths';
 import NameGenerator from '../components/NameGenerator';
 import maleFirstNames from '../data/male_first_names.json';
 import maleLastNames from '../data/male_last_names.json';
@@ -121,7 +122,7 @@ export default function Home() {
   const [mode, setMode] = useState('character');
 
   useEffect(() => {
-    fetch('/data/species.json')
+    fetch(getResourceUrl('/data/species.json'))
       .then(res => res.json())
       .then(data => setAvailableSpecies(data))
       .catch(() => setAvailableSpecies([]));
@@ -382,7 +383,7 @@ export default function Home() {
     const fetchPortrait = async () => {
       try {
         const prompt = `${character.gender} ${character.species} ${character.charClass} from Star Wars, portrait style, detailed face, ${character.alignment} alignment, professional character art`;
-        const res = await fetch('/api/replicate', {
+        const res = await fetch(getResourceUrl('/api/replicate'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt })
