@@ -77,12 +77,15 @@ export default function NameGenerator() {
             return;
           }
           
-          setSpeciesOptions(data);
+          // Sort species alphabetically
+          const sortedSpecies = [...data].sort((a, b) => a.localeCompare(b));
+          setSpeciesOptions(sortedSpecies);
+          
           // Default to Human/Common if available
-          if (data.includes("Human/Common")) {
+          if (sortedSpecies.includes("Human/Common")) {
             setNameMode("Human/Common");
-          } else if (data.length > 0) {
-            setNameMode(data[0]);
+          } else if (sortedSpecies.length > 0) {
+            setNameMode(sortedSpecies[0]);
           }
         } catch (err) {
           console.error("Error parsing species JSON:", err);
@@ -99,10 +102,21 @@ export default function NameGenerator() {
 
   const getSpeciesSpecificName = (nameData, species, gender) => {
     console.log(`Getting ${gender} name for species: ${species}`);
-    // Check if we have data for this species
+    
+    // Check if we have data for this species as an exact match
     if (nameData[species] && nameData[species].length > 0) {
       const name = nameData[species][Math.floor(Math.random() * nameData[species].length)];
       console.log(`Found ${gender} name for ${species}: ${name}`);
+      return name;
+    }
+    
+    // If not exact match, try to find a key that starts with the species name (like "Chiss/Core-world")
+    const speciesKeys = Object.keys(nameData);
+    const matchingKey = speciesKeys.find(key => key.startsWith(`${species}/`) || key.includes(`/${species}`));
+    
+    if (matchingKey && nameData[matchingKey].length > 0) {
+      const name = nameData[matchingKey][Math.floor(Math.random() * nameData[matchingKey].length)];
+      console.log(`Found ${gender} name for ${species} using key ${matchingKey}: ${name}`);
       return name;
     }
     
@@ -630,7 +644,10 @@ export default function NameGenerator() {
             if (isLastNameHyphenated) {
               // Check if prefix or suffix hyphenated
               const hyphenParts = hyphenatedPart.split('-');
-              const hyphenPosition = lastName.includes(hyphenParts[0]) ? 'suffix' : 'prefix';
+              // Safe check to ensure lastName is a string with includes method
+              const hyphenPosition = (typeof lastName === 'string' && lastName !== 'Unknown') ? 
+                (lastName.includes(hyphenParts[0]) ? 'suffix' : 'prefix') : 
+                'unknown'; // Default to 'unknown' if lastName is not valid
               nameStructure.hasHyphenatedLast = true;
               nameStructure.hyphenPosition = hyphenPosition;
               nameStructure.types.push('hyphenated-last');

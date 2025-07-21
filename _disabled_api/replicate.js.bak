@@ -50,49 +50,25 @@ export default async function handler(req, res) {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Authorization": `Token ${REPLICATE_API_TOKEN}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Token ${REPLICATE_API_TOKEN}`,
       },
       body: JSON.stringify({
-        version: undefined, // Let Replicate use the default version
+        version: "8bc78d06fe607e0798e1436ad904a2318867aa7d674986218f022c38d0c1348b", // Hard-coded imagen-4-fast version hash
         input,
-        model: REPLICATE_MODEL
-      })
+      }),
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Replicate API error:", error);
+      return res.status(500).json({ error: "Failed to generate image" });
+    }
+
     const prediction = await response.json();
-    console.log("Replicate API input:", JSON.stringify(input));
-    console.log("Replicate API prediction (initial):", JSON.stringify(prediction));
-    // If the initial prediction has an error, return it
-    if (prediction.error || prediction.detail || prediction.message) {
-      return res.status(500).json({ error: prediction.error || prediction.detail || prediction.message, prediction });
-    }
-    // Poll for completion if needed
-    let output = prediction.output;
-    let status = prediction.status;
-    let predictionId = prediction.id;
-    let pollCount = 0;
-    while ((!output || output.length === 0) && status !== 'failed' && status !== 'canceled' && pollCount < 20) {
-      await new Promise(r => setTimeout(r, 1500));
-      const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${predictionId}`, {
-        headers: { "Authorization": `Token ${REPLICATE_API_TOKEN}` }
-      });
-      const pollData = await pollRes.json();
-      console.log(`Replicate API pollData (poll #${pollCount + 1}):`, JSON.stringify(pollData));
-      if (pollData.error || pollData.detail || pollData.message) {
-        return res.status(500).json({ error: pollData.error || pollData.detail || pollData.message, pollData });
-      }
-      output = pollData.output;
-      status = pollData.status;
-      pollCount++;
-    }
-    if (typeof output === 'string' && output.startsWith('http')) {
-      return res.status(200).json({ imageUrl: output, rawOutput: output });
-    } else {
-      console.error("Replicate API returned unexpected output", { input, output, prediction });
-      return res.status(500).json({ error: "Image generation failed: Unexpected output from Replicate API.", rawOutput: output, prediction });
-    }
+    return res.status(200).json(prediction);
   } catch (error) {
-    console.error("Replicate API error", { input, error: error.message, stack: error.stack });
-    return res.status(500).json({ error: error.message || "Unknown error", details: error.stack });
+    console.error("Error during image generation:", error);
+    return res.status(500).json({ error: "Failed to connect to image generation service" });
   }
 }
