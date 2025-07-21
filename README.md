@@ -1,9 +1,10 @@
 # ⚠️ Known Issues
 
-**AI Image Generation (Replicate API) is currently broken:**
-- Official Replicate models (e.g., google/imagen-4-fast, minimax/image-01) require a version hash for the HTTP API, but do not publish it.
-- The Replicate Node.js client returns empty output for these models, even though the playground works.
-- This is a Replicate-side issue; we are awaiting support for resolution.
+**AI Portrait Generation - TEMPORARILY DISABLED:**
+- The AI portrait generation feature has been temporarily disabled.
+- This is due to ongoing API limitations and associated costs.
+- The feature will be reconsidered in a future update.
+- All other character and name generation features work normally.
 
 # 🌌 ForceFoundry - Star Wars Character & Name Generator
 

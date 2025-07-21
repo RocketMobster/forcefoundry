@@ -113,7 +113,8 @@ export default function Home() {
   const [availableSpecies, setAvailableSpecies] = useState([]);
   const [selectedSpecies, setSelectedSpecies] = useState("Random");
   const [statSystem, setStatSystem] = useState("traditional");
-  const [aiPortraitEnabled, setAiPortraitEnabled] = useState(false);
+  // AI Portrait generation is temporarily disabled
+  const [aiPortraitEnabled, setAiPortraitEnabled] = useState(false); // Always initialize to false
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [portraitError, setPortraitError] = useState(null);
@@ -358,7 +359,13 @@ export default function Home() {
   };
 
   // Generate a new portrait for an existing character
+  // TEMPORARILY DISABLED - Will be fixed in a future update
   const generateNewPortrait = async () => {
+    // Early return - AI portrait generation is disabled
+    setPortraitError("AI portrait generation is temporarily disabled.");
+    return;
+    
+    // The code below is preserved for future use
     if (!character) return;
     setPortraitError(null); // Clear error at start
     setLoading(true);
@@ -523,28 +530,25 @@ export default function Home() {
               </p>
             </div>
 
-            {/* AI Portrait Toggle */}
+            {/* AI Portrait Toggle - TEMPORARILY DISABLED */}
             <div className="max-w-md mx-auto mb-6">
               <label className="flex items-center justify-between text-sm font-medium text-gray-300">
                 <span>AI Portrait Generation:</span>
-                <button
-                  onClick={() => setAiPortraitEnabled(!aiPortraitEnabled)}
-                  className={`relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 ${
-                    aiPortraitEnabled ? 'bg-blue-600' : 'bg-gray-600'
-                  }`}
-                >
-                  <span
-                    className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 ${
-                      aiPortraitEnabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
+                <div className="flex items-center gap-2">
+                  <span className="text-yellow-500 text-xs font-medium">[TEMPORARILY DISABLED]</span>
+                  <button
+                    disabled={true}
+                    className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 bg-gray-700 cursor-not-allowed opacity-60"
+                  >
+                    <span
+                      className="inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 translate-x-1"
+                    />
+                  </button>
+                </div>
               </label>
               <p className="text-xs text-gray-500 mt-1">
-                {aiPortraitEnabled 
-                  ? 'Characters will attempt to generate AI portraits (may fail if API unavailable)'
-                  : 'Characters will use class icons instead of AI portraits'
-                }
+                AI portrait generation is currently disabled due to API limitations.
+                <span className="text-yellow-400 ml-1">Feature will be fixed in a future update.</span>
               </p>
             </div>
 
@@ -585,17 +589,7 @@ export default function Home() {
                     <span>🎲</span>
                     Reroll Name
                   </button>
-                  {aiPortraitEnabled && (
-                    <button
-                      onClick={generateNewPortrait}
-                      disabled={loading}
-                      className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 px-4 py-2 rounded flex items-center gap-2"
-                      title="Generate a new AI portrait"
-                    >
-                      <span>🖼️</span>
-                      {loading ? 'Generating...' : 'New Portrait'}
-                    </button>
-                  )}
+                  {/* New Portrait button removed - AI portrait generation temporarily disabled */}
                   <button
                     onClick={downloadJSON}
                     className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2"
@@ -626,9 +620,8 @@ export default function Home() {
             {loading && (
               <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-opacity-50 mb-6"></div>
-                <div className="text-2xl font-bold mb-2 text-white">Generating portrait...</div>
-                <div className="text-sm text-gray-300 mb-2">This may take up to 30 seconds. Please wait.</div>
-                <div className="text-xs text-gray-400">If this takes too long or fails, try again or check your API key.</div>
+                <div className="text-2xl font-bold mb-2 text-white">Generating character...</div>
+                <div className="text-sm text-gray-300 mb-2">Please wait.</div>
               </div>
             )}
 

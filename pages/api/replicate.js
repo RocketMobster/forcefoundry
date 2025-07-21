@@ -1,11 +1,27 @@
-// TODO: AI image generation is currently broken due to Replicate API/version requirements for official models.
-// The Node.js client returns empty output, and the HTTP API requires a hidden version hash.
-// Awaiting Replicate support for resolution. See README Known Issues.
-// Next.js API route for Replicate official model using the Replicate Node.js client
+// ===================================================================
+// TEMPORARILY DISABLED: AI PORTRAIT GENERATION
+// ===================================================================
+// This API endpoint is currently disabled due to issues with the Replicate API
+// and associated costs. The feature may be re-enabled in a future update.
+//
+// Original issues:
+// - AI image generation is broken due to Replicate API/version requirements for official models
+// - The Node.js client returns empty output, and the HTTP API requires a hidden version hash
+// - Additional expenses related to API usage
+//
+// The code is preserved for future restoration if needed.
+// ===================================================================
 
 import fetch from "node-fetch";
 
 export default async function handler(req, res) {
+  // Return disabled message regardless of request method
+  return res.status(503).json({ 
+    error: "AI portrait generation is temporarily disabled", 
+    message: "This feature is currently disabled due to API limitations and associated costs. It may be restored in a future update."
+  });
+
+  // Original implementation preserved below
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }

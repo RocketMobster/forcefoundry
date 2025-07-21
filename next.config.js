@@ -2,6 +2,7 @@
 const nextConfig = {
   output: 'export',
   basePath: process.env.NODE_ENV === 'production' ? '/forcefoundry' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/forcefoundry/' : '',
   images: {
     unoptimized: true
   },
