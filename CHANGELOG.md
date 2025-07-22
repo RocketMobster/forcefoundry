@@ -1,3 +1,10 @@
+# [2.3.2] - 2025-07-22
+
+### 🛠 Minor UI & Routing Fixes
+
+- **IMPROVED**: Navigation menu note restyled and repositioned; now appears inside the slider body, bottom right, with smaller font and updated wording.
+- **ADDED**: Internal link helper function (`getInternalLink`) for correct routing in both development and GitHub Pages environments; info page link now uses this helper.
+
 # Changelog
 
 All notable changes to ForceFoundry will be documented in this file.

@@ -1,3 +1,9 @@
+// Helper for internal links to handle basePath
+function getInternalLink(path) {
+  const basePath = process.env.NODE_ENV === 'production' ? '/forcefoundry' : '';
+  if (!path.startsWith('/')) path = '/' + path;
+  return `${basePath}${path}`;
+}
 import { useState, useEffect } from 'react';
 import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { getResourceUrl } from '../utils/paths';
@@ -493,17 +499,19 @@ export default function Home() {
             <span role="img" aria-label="name">📝</span> Name Generator
           </button>
           <a
-            href="/info"
+            href={getInternalLink('info')}
             className="p-2 rounded-full bg-gray-700 hover:bg-blue-600 text-white transition-colors duration-150"
             title="Information"
           >
             <span role="img" aria-label="info">ℹ️</span>
           </a>
         </div>
-        {/* Note pointing to handle */}
+        {/* Note now inside slider body, bottom right next to info button */}
         {navOpen && (
-          <div className="fixed" style={{ top: '146px', left: '40px', zIndex: 50, background: '#111827', color: '#3b82f6', borderRadius: '0.5rem', padding: '0.25rem 0.75rem', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '2px solid #3b82f6' }}>
-            ← Click the flag to open navigation
+          <div className="absolute bottom-2 right-2 flex items-end justify-end w-full pr-2" style={{ pointerEvents: 'none' }}>
+            <span className="text-xs text-blue-400 text-right" style={{ fontSize: '0.75rem', marginLeft: '2.5rem' }}>
+              Click Flag to Open/Close Navigation
+            </span>
           </div>
         )}
       </div>

@@ -824,8 +824,16 @@ export default function NameGenerator() {
               type="number"
               min="1"
               max="100"
-              value={quantity}
-              onChange={(e) => setQuantity(Math.min(100, Math.max(1, parseInt(e.target.value || "10"))))}
+              value={quantity === 0 ? '' : quantity}
+              onChange={e => {
+                const val = e.target.value;
+                if (val === '' || isNaN(Number(val))) {
+                  setQuantity(0);
+                } else {
+                  const num = Math.max(1, Math.min(100, Number(val)));
+                  setQuantity(num);
+                }
+              }}
               className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
             />
           </div>

@@ -41,13 +41,12 @@ export default function Info() {
           >
             <FaInfoCircle style={{ color: '#9ca3af', fontSize: '1.25rem' }} />
           </a>
+          {navOpen && (
+            <span className="ml-2 text-blue-400 text-sm font-medium" style={{ alignSelf: 'center' }}>
+              Click the flag to open/close navigation
+            </span>
+          )}
         </div>
-        {/* Note pointing to handle */}
-        {navOpen && (
-          <div className="fixed" style={{ top: '146px', left: '40px', zIndex: 50, background: '#111827', color: '#3b82f6', borderRadius: '0.5rem', padding: '0.25rem 0.75rem', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '2px solid #3b82f6' }}>
-            ← Click the flag to open navigation
-          </div>
-        )}
       </div>
       <Header />
       <main className="max-w-screen-sm mx-auto w-full px-2 py-2">
