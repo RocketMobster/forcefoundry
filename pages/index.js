@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { getResourceUrl } from '../utils/paths';
 import NameGenerator from '../components/NameGenerator';
 import maleFirstNames from '../data/male_first_names.json';
@@ -111,6 +112,7 @@ const canonCount = Object.values(canonNamesData).flat().length;
 console.log(`Canon names loaded: ${canonNamesLoaded ? 'Yes' : 'No'}, count: ${canonCount}`);
 
 export default function Home() {
+  const [navOpen, setNavOpen] = useState(true);
   const [availableSpecies, setAvailableSpecies] = useState([]);
   const [selectedSpecies, setSelectedSpecies] = useState("Random");
   const [statSystem, setStatSystem] = useState("traditional");
@@ -458,32 +460,54 @@ export default function Home() {
               <span className="text-yellow-400 text-2xl">⚡</span>
               <span className="text-2xl font-extrabold tracking-wider text-white">ForceFoundry</span>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 ${mode === 'character' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
-                onClick={() => setMode('character')}
-              >
-                <span role="img" aria-label="character">🧑‍🎤</span> Character Generator
-              </button>
-              <button
-                className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 ${mode === 'name' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
-                onClick={() => setMode('name')}
-              >
-                <span role="img" aria-label="name">📝</span> Name Generator
-              </button>
-              <a
-                href="/info"
-                className="ml-2 p-2 rounded-full bg-gray-700 hover:bg-blue-600 text-white transition-colors duration-150"
-                title="Information"
-              >
-                <span role="img" aria-label="info">ℹ️</span>
-              </a>
-            </div>
+            {/* Navigation moved to floating container below header for mobile UX */}
           </div>
         </header>
         
         {/* Main content */}
-        <main className="max-w-4xl mx-auto px-6 pb-16">
+      {/* Retractable floating navigation container for mobile and desktop */}
+      {/* Handle to open/close nav - always visible at left edge, outside nav */}
+      <button
+        className="fixed" style={{ top: '140px', left: 0, zIndex: 40, backgroundColor: '#f59e42', color: 'white', borderRadius: '0 0.75rem 0.75rem 0', padding: '0.5rem 0.5rem', minWidth: '32px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center' }}
+        onClick={() => setNavOpen(v => !v)}
+        aria-label={navOpen ? 'Hide navigation' : 'Show navigation'}
+      >
+        {navOpen ? <FaChevronLeft /> : <FaChevronRight />}
+      </button>
+      <div
+        className="fixed top-20 left-0 z-30 w-[180px] flex flex-col md:flex-row items-center gap-2 p-2 bg-gray-800 bg-opacity-95 rounded-xl shadow-lg border border-gray-700 mb-4 transition-transform duration-300"
+        style={{ minHeight: '56px', transform: navOpen ? 'translateX(0)' : 'translateX(-148px)' }}
+      >
+        {/* Nav content */}
+        <div className={`flex flex-col md:flex-row items-center gap-2 w-[180px] md:w-auto transition-all duration-300 ${navOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} style={{ alignItems: 'flex-start' }}>
+          <button
+            className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 w-full md:w-auto ${mode === 'character' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
+            onClick={() => setMode('character')}
+          >
+            <span role="img" aria-label="character">🧑‍🎤</span> Character Generator
+          </button>
+          <button
+            className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 w-full md:w-auto ${mode === 'name' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
+            onClick={() => setMode('name')}
+          >
+            <span role="img" aria-label="name">📝</span> Name Generator
+          </button>
+          <a
+            href="/info"
+            className="p-2 rounded-full bg-gray-700 hover:bg-blue-600 text-white transition-colors duration-150"
+            title="Information"
+          >
+            <span role="img" aria-label="info">ℹ️</span>
+          </a>
+        </div>
+        {/* Note pointing to handle */}
+        {navOpen && (
+          <div className="fixed" style={{ top: '146px', left: '40px', zIndex: 50, background: '#111827', color: '#3b82f6', borderRadius: '0.5rem', padding: '0.25rem 0.75rem', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '2px solid #3b82f6' }}>
+            ← Click the flag to open navigation
+          </div>
+        )}
+      </div>
+      <main className="max-w-4xl mx-auto px-6 pb-16">
           {mode === 'character' ? (
             <>
               <div className="text-center mb-8">

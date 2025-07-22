@@ -16,7 +16,7 @@ export default function Names() {
   const [names, setNames] = useState([]);
   const [gender, setGender] = useState('Male');
   const [species, setSpecies] = useState('Random Mix');
-  const [quantity, setQuantity] = useState(18);
+  const [quantity, setQuantity] = useState('18');
   const [loading, setLoading] = useState(false);
 
   const getRandom = (arr) => {
@@ -218,7 +218,15 @@ export default function Names() {
                 min="5"
                 max="100"
                 value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 18)}
+                onChange={e => {
+                  const val = e.target.value;
+                  // Allow empty string for easy overwrite
+                  if (val === '' || isNaN(Number(val))) {
+                    setQuantity('');
+                  } else {
+                    setQuantity(val);
+                  }
+                }}
                 className="bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white w-20 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

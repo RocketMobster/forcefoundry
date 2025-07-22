@@ -1,8 +1,54 @@
 import Header from '../components/Header';
+import { FaChevronLeft, FaChevronRight, FaInfoCircle } from 'react-icons/fa';
+import { useState } from 'react';
 
 export default function Info() {
+  const [navOpen, setNavOpen] = useState(true);
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
+      {/* Floating nav and handle, always visible on info page */}
+      <button
+        className="fixed" style={{ top: '140px', left: 0, zIndex: 40, backgroundColor: '#f59e42', color: 'white', borderRadius: '0 0.75rem 0.75rem 0', padding: '0.5rem 0.5rem', minWidth: '32px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center' }}
+        onClick={() => setNavOpen(v => !v)}
+        aria-label={navOpen ? 'Hide navigation' : 'Show navigation'}
+      >
+        {navOpen ? <FaChevronLeft /> : <FaChevronRight />}
+      </button>
+      <div
+        className="fixed top-20 left-0 z-30 w-[180px] flex flex-col md:flex-row items-center gap-2 p-2 bg-gray-800 bg-opacity-95 rounded-xl shadow-lg border border-gray-700 mb-4 transition-transform duration-300"
+        style={{ minHeight: '56px', transform: navOpen ? 'translateX(0)' : 'translateX(-148px)' }}
+      >
+        <div className={`flex flex-col md:flex-row items-center gap-2 w-[180px] md:w-auto transition-all duration-300 ${navOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} style={{ alignItems: 'flex-start' }}>
+          <a
+            href="/"
+            className="flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 w-full md:w-auto bg-blue-600 text-white"
+          >
+            <span role="img" aria-label="character">🧑‍🎤</span> Character Generator
+          </a>
+          <a
+            href="/"
+            className="flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 w-full md:w-auto bg-gray-700 text-gray-300 hover:bg-blue-700"
+          >
+            <span role="img" aria-label="name">📝</span> Name Generator
+          </a>
+          <a
+            href="/info"
+            className="p-2 rounded-full bg-gray-500 text-gray-300 cursor-not-allowed transition-colors duration-150"
+            title="Information"
+            aria-disabled="true"
+            tabIndex="-1"
+            onClick={e => e.preventDefault()}
+          >
+            <FaInfoCircle style={{ color: '#9ca3af', fontSize: '1.25rem' }} />
+          </a>
+        </div>
+        {/* Note pointing to handle */}
+        {navOpen && (
+          <div className="fixed" style={{ top: '146px', left: '40px', zIndex: 50, background: '#111827', color: '#3b82f6', borderRadius: '0.5rem', padding: '0.25rem 0.75rem', fontSize: '0.85rem', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', border: '2px solid #3b82f6' }}>
+            ← Click the flag to open navigation
+          </div>
+        )}
+      </div>
       <Header />
       <main className="max-w-screen-sm mx-auto w-full px-2 py-2">
         <div className="text-center mb-8">

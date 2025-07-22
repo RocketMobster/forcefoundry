@@ -13,30 +13,7 @@ export default function Header() {
             <span className="text-2xl">⚡</span>
             <h1 className="text-xl font-bold text-white">ForceFoundry</h1>
           </div>
-          
-          <nav className="flex flex-col w-full gap-2 md:flex-row md:w-auto md:gap-1 items-center">
-            <Link href="/" className={`px-4 py-2 rounded-lg transition-colors ${
-                router.pathname === '/' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-              }`}>
-                🧘 Character Generator
-            </Link>
-            <Link href="/names" className={`px-4 py-2 rounded-lg transition-colors ${
-                router.pathname === '/names' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-              }`}>
-                📝 Name Generator
-            </Link>
-            <Link href={getResourceUrl('/info')} className={`px-3 py-2 rounded-lg transition-colors ${
-                router.pathname === '/info' 
-                  ? 'bg-purple-600 text-white' 
-                  : 'text-gray-400 hover:bg-gray-700 hover:text-white'
-              }`} title="App Information">
-                ℹ️
-            </Link>
-          </nav>
+          {/* Navigation moved to floating container in index.js for mobile UX */}
         </div>
       </div>
     </header>
