@@ -450,292 +450,294 @@ export default function Home() {
   
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
-      {/* Header matching screenshot */}
-      <header className="w-full bg-gray-800 shadow-md py-3 mb-8">
-        <div className="max-w-4xl mx-auto flex items-center justify-between px-6">
-          <div className="flex items-center gap-2">
-            <span className="text-yellow-400 text-2xl">⚡</span>
-            <span className="text-2xl font-extrabold tracking-wider text-white">ForceFoundry</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 ${mode === 'character' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
-              onClick={() => setMode('character')}
-            >
-              <span role="img" aria-label="character">🧑‍🎤</span> Character Generator
-            </button>
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 ${mode === 'name' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
-              onClick={() => setMode('name')}
-            >
-              <span role="img" aria-label="name">📝</span> Name Generator
-            </button>
-            <a
-              href="/info"
-              className="ml-2 p-2 rounded-full bg-gray-700 hover:bg-blue-600 text-white transition-colors duration-150"
-              title="Information"
-            >
-              <span role="img" aria-label="info">ℹ️</span>
-            </a>
-          </div>
-        </div>
-      </header>
-      
-      {/* Main content */}
-      <main className="max-w-4xl mx-auto px-6 pb-16">
-        {mode === 'character' ? (
-          <>
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2">Character Generator</h2>
-              <p className="text-gray-400">Create detailed Star Wars characters with stats and backgrounds</p>
+      <main className="max-w-screen-sm mx-auto w-full px-2 py-2">
+        {/* Header matching screenshot */}
+        <header className="w-full bg-gray-800 shadow-md py-3 mb-8">
+          <div className="max-w-4xl mx-auto flex items-center justify-between px-6">
+            <div className="flex items-center gap-2">
+              <span className="text-yellow-400 text-2xl">⚡</span>
+              <span className="text-2xl font-extrabold tracking-wider text-white">ForceFoundry</span>
             </div>
-            
-            {/* Species Selection */}
-            <div className="max-w-md mx-auto mb-6">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Species Selection:
-              </label>
-              <select
-                value={selectedSpecies}
-                onChange={(e) => setSelectedSpecies(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-              >
-                <option value="Random">Random Species</option>
-                {availableSpecies.sort().map(species => (
-                  <option key={species} value={species}>{species}</option>
-                ))}
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                Select a specific species or choose "Random" for variety
-              </p>
-            </div>
-
-            {/* Stat System Toggle */}
-            <div className="max-w-md mx-auto mb-6">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Stat System:
-              </label>
-              <select
-                value={statSystem}
-                onChange={(e) => setStatSystem(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-              >
-                <option value="traditional">Traditional RPG (Str, Agi, Int, Wis, Cha, Con)</option>
-                <option value="swtor">Star Wars: The Old Republic (Str, End, Aim, Cun, Will, HP)</option>
-              </select>
-              <p className="text-xs text-gray-500 mt-1">
-                {statSystem === 'traditional' 
-                  ? 'Classic D&D-style attributes for general RPG systems'
-                  : 'SWTOR-specific stats with hitpoints calculated from endurance (x10)'
-                }
-              </p>
-            </div>
-
-            {/* AI Portrait Toggle - TEMPORARILY DISABLED */}
-            <div className="max-w-md mx-auto mb-6">
-              <label className="flex items-center justify-between text-sm font-medium text-gray-300">
-                <span>AI Portrait Generation:</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-yellow-500 text-xs font-medium">[TEMPORARILY DISABLED]</span>
-                  <button
-                    disabled={true}
-                    className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 bg-gray-700 cursor-not-allowed opacity-60"
-                  >
-                    <span
-                      className="inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 translate-x-1"
-                    />
-                  </button>
-                </div>
-              </label>
-              <p className="text-xs text-gray-500 mt-1">
-                AI portrait generation is currently disabled due to API limitations.
-                <span className="text-yellow-400 ml-1">Feature will be fixed in a future update.</span>
-              </p>
-            </div>
-
-            <div className="flex justify-center gap-4 mb-6">
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => generateCharacter(false)}
-                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded flex items-center gap-2"
-                title={character ? `Generate another ${character.gender} ${character.charClass} (keeps current species and settings)` : "Generate a Male Jedi"}
+                className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 ${mode === 'character' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
+                onClick={() => setMode('character')}
               >
-                <span>🔄</span>
-                {character ? "Same Type" : "Generate Character"}
+                <span role="img" aria-label="character">🧑‍🎤</span> Character Generator
               </button>
               <button
-                onClick={() => generateCharacter(true)}
-                className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded flex items-center gap-2"
-                title="Randomizes everything: gender, class, species, and all attributes. Use this to start completely fresh."
+                className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 ${mode === 'name' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
+                onClick={() => setMode('name')}
               >
-                <span>🎲</span>
-                New Character (Full Random)
+                <span role="img" aria-label="name">📝</span> Name Generator
               </button>
-              {character && (
-                <button
-                  onClick={rerollStats}
-                  className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded flex items-center gap-2"
-                  title="Reroll stats only (keep name, species, class, portrait, etc.)"
+              <a
+                href="/info"
+                className="ml-2 p-2 rounded-full bg-gray-700 hover:bg-blue-600 text-white transition-colors duration-150"
+                title="Information"
+              >
+                <span role="img" aria-label="info">ℹ️</span>
+              </a>
+            </div>
+          </div>
+        </header>
+        
+        {/* Main content */}
+        <main className="max-w-4xl mx-auto px-6 pb-16">
+          {mode === 'character' ? (
+            <>
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold mb-2">Character Generator</h2>
+                <p className="text-gray-400">Create detailed Star Wars characters with stats and backgrounds</p>
+              </div>
+              
+              {/* Species Selection */}
+              <div className="max-w-md mx-auto mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Species Selection:
+                </label>
+                <select
+                  value={selectedSpecies}
+                  onChange={(e) => setSelectedSpecies(e.target.value)}
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
                 >
-                  <span>🧮</span>
-                  Reroll Stats
+                  <option value="Random">Random Species</option>
+                  {availableSpecies.sort().map(species => (
+                    <option key={species} value={species}>{species}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Select a specific species or choose "Random" for variety
+                </p>
+              </div>
+
+              {/* Stat System Toggle */}
+              <div className="max-w-md mx-auto mb-6">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Stat System:
+                </label>
+                <select
+                  value={statSystem}
+                  onChange={(e) => setStatSystem(e.target.value)}
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="traditional">Traditional RPG (Str, Agi, Int, Wis, Cha, Con)</option>
+                  <option value="swtor">Star Wars: The Old Republic (Str, End, Aim, Cun, Will, HP)</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {statSystem === 'traditional' 
+                    ? 'Classic D&D-style attributes for general RPG systems'
+                    : 'SWTOR-specific stats with hitpoints calculated from endurance (x10)'
+                  }
+                </p>
+              </div>
+
+              {/* AI Portrait Toggle - TEMPORARILY DISABLED */}
+              <div className="max-w-md mx-auto mb-6">
+                <label className="flex items-center justify-between text-sm font-medium text-gray-300">
+                  <span>AI Portrait Generation:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-yellow-500 text-xs font-medium">[TEMPORARILY DISABLED]</span>
+                    <button
+                      disabled={true}
+                      className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 bg-gray-700 cursor-not-allowed opacity-60"
+                    >
+                      <span
+                        className="inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 translate-x-1"
+                      />
+                    </button>
+                  </div>
+                </label>
+                <p className="text-xs text-gray-500 mt-1">
+                  AI portrait generation is currently disabled due to API limitations.
+                  <span className="text-yellow-400 ml-1">Feature will be fixed in a future update.</span>
+                </p>
+              </div>
+
+              <div className="flex flex-col w-full gap-2 md:flex-row md:w-auto md:gap-4 mb-6 justify-center items-stretch">
+                <button
+                  onClick={() => generateCharacter(false)}
+                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
+                  title={character ? `Generate another ${character.gender} ${character.charClass} (keeps current species and settings)` : "Generate a Male Jedi"}
+                >
+                  <span>🔄</span>
+                  {character ? "Same Type" : "Generate Character"}
                 </button>
-              )}
-              {character && (
-                <>
+                <button
+                  onClick={() => generateCharacter(true)}
+                  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
+                  title="Randomizes everything: gender, class, species, and all attributes. Use this to start completely fresh."
+                >
+                  <span>🎲</span>
+                  New Character (Full Random)
+                </button>
+                {character && (
                   <button
-                    onClick={rerollName}
-                    className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded flex items-center gap-2"
-                    title="Generate a new name for this character"
+                    onClick={rerollStats}
+                    className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
+                    title="Reroll stats only (keep name, species, class, portrait, etc.)"
                   >
-                    <span>🎲</span>
-                    Reroll Name
+                    <span>🧮</span>
+                    Reroll Stats
                   </button>
-                  {/* New Portrait button removed - AI portrait generation temporarily disabled */}
-                  <button
-                    onClick={downloadJSON}
-                    className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2"
-                  >
-                    <span>💾</span>
-                    Download JSON
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Button explanations */}
-            <div className="text-center text-sm text-gray-400 mb-6">
-              {character ? (
-                <div className="space-y-1">
-                  <p><span className="text-blue-400">🔄 Same Type:</span> Generate another {character.gender} {character.charClass}</p>
-                  <p><span className="text-purple-400">🎲 New Character:</span> Randomize everything (gender, class, etc.)</p>
-                  <p><span className="text-orange-400">🎲 Reroll Name:</span> Generate a new name for this character</p>
-                  {aiPortraitEnabled && (
-                    <p><span className="text-purple-400">🖼️ New Portrait:</span> Generate a new AI portrait</p>
-                  )}
-                </div>
-              ) : (
-                <p>Click <span className="text-blue-400">Generate Character</span> to create your first Star Wars character!</p>
-              )}
-            </div>
-
-            {loading && (
-              <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-opacity-50 mb-6"></div>
-                <div className="text-2xl font-bold mb-2 text-white">Generating character...</div>
-                <div className="text-sm text-gray-300 mb-2">Please wait.</div>
+                )}
+                {character && (
+                  <>
+                    <button
+                      onClick={rerollName}
+                      className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
+                      title="Generate a new name for this character"
+                    >
+                      <span>🎲</span>
+                      Reroll Name
+                    </button>
+                    {/* New Portrait button removed - AI portrait generation temporarily disabled */}
+                    <button
+                      onClick={downloadJSON}
+                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
+                    >
+                      <span>💾</span>
+                      Download JSON
+                    </button>
+                  </>
+                )}
               </div>
-            )}
 
-            {/* Always show portrait error at the top if present */}
-            {portraitError && !loading && (
-              <div className="max-w-xl mx-auto bg-gray-900 rounded-xl p-4 shadow-md border border-red-500 mb-6">
-                <div className="text-center">
-                  <div className="text-red-400 text-xs mb-1 font-bold">Portrait generation failed:</div>
-                  <div className="text-red-300 text-xs whitespace-pre-wrap break-all" style={{ maxWidth: '32rem', margin: '0 auto' }}>{portraitError}</div>
-                  <button
-                    className="mt-2 px-2 py-1 bg-gray-700 text-xs text-gray-200 rounded hover:bg-gray-600 border border-gray-500"
-                    onClick={() => {
-                      navigator.clipboard.writeText(portraitError);
-                    }}
-                  >Copy Error</button>
-                  {aiPortraitEnabled && (
-                    <div className="text-yellow-400 text-xs mt-1">
-                      Try the "🖼️ New Portrait" button or disable AI portraits
-                    </div>
-                  )}
-                </div>
+              {/* Button explanations */}
+              <div className="text-center text-sm text-gray-400 mb-6">
+                {character ? (
+                  <div className="space-y-1">
+                    <p><span className="text-blue-400">🔄 Same Type:</span> Generate another {character.gender} {character.charClass}</p>
+                    <p><span className="text-purple-400">🎲 New Character:</span> Randomize everything (gender, class, etc.)</p>
+                    <p><span className="text-orange-400">🎲 Reroll Name:</span> Generate a new name for this character</p>
+                    {aiPortraitEnabled && (
+                      <p><span className="text-purple-400">🖼️ New Portrait:</span> Generate a new AI portrait</p>
+                    )}
+                  </div>
+                ) : (
+                  <p>Click <span className="text-blue-400">Generate Character</span> to create your first Star Wars character!</p>
+                )}
               </div>
-            )}
 
-            {/* Character display will go here */}
-            {character && !loading && (
-              <div className="mt-8">
-                {/* Character card display */}
-                <div className={`max-w-2xl mx-auto bg-gray-800 rounded-xl overflow-hidden shadow-lg ${character.isCanon ? 'border-2 border-yellow-400' : 'border border-gray-700'}`}>
-                  <div className="md:flex">
-                    <div className="md:flex-shrink-0 relative">
-                      {character.image ? (
-                        <img
-                          className="h-48 w-full object-cover md:h-full md:w-48"
-                          src={character.image}
-                          alt={character.name}
-                        />
-                      ) : (
-                        <div className="h-48 w-full md:h-full md:w-48 bg-gray-700 flex items-center justify-center">
-                          <div className="text-center p-4">
-                            <div className="text-4xl mb-2">
-                              {character.charClass === 'Jedi' ? '🧙‍♂️' :
-                               character.charClass === 'Sith' ? '🦹‍♂️' :
-                               character.charClass === 'Bounty Hunter' ? '🏹' :
-                               character.charClass === 'Smuggler' ? '🚀' : '👤'}
+              {loading && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-opacity-50 mb-6"></div>
+                  <div className="text-2xl font-bold mb-2 text-white">Generating character...</div>
+                  <div className="text-sm text-gray-300 mb-2">Please wait.</div>
+                </div>
+              )}
+
+              {/* Always show portrait error at the top if present */}
+              {portraitError && !loading && (
+                <div className="max-w-xl mx-auto bg-gray-900 rounded-xl p-4 shadow-md border border-red-500 mb-6">
+                  <div className="text-center">
+                    <div className="text-red-400 text-xs mb-1 font-bold">Portrait generation failed:</div>
+                    <div className="text-red-300 text-xs whitespace-pre-wrap break-all" style={{ maxWidth: '32rem', margin: '0 auto' }}>{portraitError}</div>
+                    <button
+                      className="mt-2 px-2 py-1 bg-gray-700 text-xs text-gray-200 rounded hover:bg-gray-600 border border-gray-500"
+                      onClick={() => {
+                        navigator.clipboard.writeText(portraitError);
+                      }}
+                    >Copy Error</button>
+                    {aiPortraitEnabled && (
+                      <div className="text-yellow-400 text-xs mt-1">
+                        Try the "🖼️ New Portrait" button or disable AI portraits
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Character display will go here */}
+              {character && !loading && (
+                <div className="mt-8">
+                  {/* Character card display */}
+                  <div className={`max-w-2xl mx-auto bg-gray-800 rounded-xl overflow-hidden shadow-lg ${character.isCanon ? 'border-2 border-yellow-400' : 'border border-gray-700'}`}>
+                    <div className="md:flex">
+                      <div className="md:flex-shrink-0 relative">
+                        {character.image ? (
+                          <img
+                            className="h-48 w-full object-cover md:h-full md:w-48"
+                            src={character.image}
+                            alt={character.name}
+                          />
+                        ) : (
+                          <div className="h-48 w-full md:h-full md:w-48 bg-gray-700 flex items-center justify-center">
+                            <div className="text-center p-4">
+                              <div className="text-4xl mb-2">
+                                {character.charClass === 'Jedi' ? '🧙‍♂️' :
+                                 character.charClass === 'Sith' ? '🦹‍♂️' :
+                                 character.charClass === 'Bounty Hunter' ? '🏹' :
+                                 character.charClass === 'Smuggler' ? '🚀' : '👤'}
+                              </div>
+                              <div className="text-sm text-gray-300">{character.charClass}</div>
                             </div>
-                            <div className="text-sm text-gray-300">{character.charClass}</div>
+                          </div>
+                        )}
+                        {character.isCanon && (
+                          <div className="absolute top-2 left-2">
+                            <span className="text-yellow-300 text-xl">★</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-6">
+                        <div className="mb-2">
+                          <h2 className="text-2xl font-bold">{character.name}</h2>
+                          {character.isCanon && (
+                            <p className="text-sm text-yellow-400">Canon Star Wars character name</p>
+                          )}
+                          <div className="text-gray-400 text-sm mb-4">
+                            {character.species} {character.gender} {character.charClass} • {character.alignment}
                           </div>
                         </div>
-                      )}
-                      {character.isCanon && (
-                        <div className="absolute top-2 left-2">
-                          <span className="text-yellow-300 text-xl">★</span>
+                        
+                        <div className="mb-4">
+                          <h3 className="text-lg font-medium mb-2 text-blue-400">Stats</h3>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+                            {Object.entries(character.stats).map(([stat, value]) => (
+                              <div key={stat} className="bg-gray-700 rounded p-2">
+                                <span className="text-gray-400 capitalize">{stat}: </span>
+                                <span className="font-medium">{value}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="mb-2">
-                        <h2 className="text-2xl font-bold">{character.name}</h2>
-                        {character.isCanon && (
-                          <p className="text-sm text-yellow-400">Canon Star Wars character name</p>
-                        )}
-                        <div className="text-gray-400 text-sm mb-4">
-                          {character.species} {character.gender} {character.charClass} • {character.alignment}
+                        
+                        <div className="mb-4">
+                          <h3 className="text-lg font-medium mb-2 text-blue-400">Equipment</h3>
+                          <ul className="list-disc list-inside text-sm">
+                            {character.equipment.map((item, index) => (
+                              <li key={index} className="text-gray-300">{item}</li>
+                            ))}
+                            {character.forceUser && character.lightsaberColor && (
+                              <li className="text-gray-300">
+                                <span className={`text-${character.lightsaberColor === 'red' ? 'red' : 
+                                                        character.lightsaberColor === 'blue' ? 'blue' : 
+                                                        character.lightsaberColor === 'green' ? 'green' : 
+                                                        character.lightsaberColor === 'purple' ? 'purple' : 'yellow'}-400`}>
+                                  {character.lightsaberColor.charAt(0).toUpperCase() + character.lightsaberColor.slice(1)}
+                                </span> lightsaber crystal
+                              </li>
+                            )}
+                          </ul>
                         </div>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <h3 className="text-lg font-medium mb-2 text-blue-400">Stats</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-                          {Object.entries(character.stats).map(([stat, value]) => (
-                            <div key={stat} className="bg-gray-700 rounded p-2">
-                              <span className="text-gray-400 capitalize">{stat}: </span>
-                              <span className="font-medium">{value}</span>
-                            </div>
-                          ))}
+                        
+                        <div>
+                          <h3 className="text-lg font-medium mb-2 text-blue-400">Homeworld</h3>
+                          <p className="text-sm text-gray-300">
+                            {character.homeworld.name || 'Unknown'} ({character.homeworld.type})
+                          </p>
                         </div>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <h3 className="text-lg font-medium mb-2 text-blue-400">Equipment</h3>
-                        <ul className="list-disc list-inside text-sm">
-                          {character.equipment.map((item, index) => (
-                            <li key={index} className="text-gray-300">{item}</li>
-                          ))}
-                          {character.forceUser && character.lightsaberColor && (
-                            <li className="text-gray-300">
-                              <span className={`text-${character.lightsaberColor === 'red' ? 'red' : 
-                                                      character.lightsaberColor === 'blue' ? 'blue' : 
-                                                      character.lightsaberColor === 'green' ? 'green' : 
-                                                      character.lightsaberColor === 'purple' ? 'purple' : 'yellow'}-400`}>
-                                {character.lightsaberColor.charAt(0).toUpperCase() + character.lightsaberColor.slice(1)}
-                              </span> lightsaber crystal
-                            </li>
-                          )}
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-lg font-medium mb-2 text-blue-400">Homeworld</h3>
-                        <p className="text-sm text-gray-300">
-                          {character.homeworld.name || 'Unknown'} ({character.homeworld.type})
-                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </>
-        ) : (
-          <NameGenerator />
-        )}
+              )}
+            </>
+          ) : (
+            <NameGenerator />
+          )}
+        </main>
       </main>
     </div>
   );

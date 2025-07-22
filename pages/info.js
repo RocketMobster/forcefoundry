@@ -4,15 +4,15 @@ export default function Info() {
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
       <Header />
-      <main className="max-w-4xl mx-auto px-6">
+      <main className="max-w-screen-sm mx-auto w-full px-2 py-2">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-2">⚡ ForceFoundry</h2>
           <p className="text-gray-400">Star Wars Character & Name Generator</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-8">
           {/* Version & Developer Info */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+          <div className="bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-700">
             <h3 className="text-xl font-semibold mb-4 text-blue-400">📋 Application Info</h3>
             <div className="space-y-3">
               <div>
@@ -40,7 +40,7 @@ export default function Info() {
           </div>
 
           {/* Features */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+          <div className="bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-700">
             <h3 className="text-xl font-semibold mb-4 text-green-400">🚀 Features</h3>
             <ul className="space-y-2 text-gray-300">
               <li className="flex items-start">
@@ -71,7 +71,7 @@ export default function Info() {
           </div>
 
           {/* License */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+          <div className="bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-700">
             <h3 className="text-xl font-semibold mb-4 text-purple-400">📄 License</h3>
             <div className="text-gray-300 text-sm leading-relaxed">
               <p className="mb-3">
@@ -91,7 +91,7 @@ export default function Info() {
           </div>
 
           {/* Acknowledgments */}
-          <div className="bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+          <div className="bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-700">
             <h3 className="text-xl font-semibold mb-4 text-yellow-400">🌟 Acknowledgments</h3>
             <div className="text-gray-300 text-sm space-y-2">
               <p>• Star Wars universe © Lucasfilm Ltd.</p>
@@ -104,9 +104,9 @@ export default function Info() {
         </div>
 
         {/* Fun Stats */}
-        <div className="mt-8 bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-700">
+        <div className="mt-8 bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-gray-700">
           <h3 className="text-xl font-semibold mb-4 text-center text-red-400">⚡ Fun Stats</h3>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4 text-center">
             <div className="bg-gray-700 rounded-lg p-4">
               <div className="text-2xl font-bold text-blue-400">15+</div>
               <div className="text-sm text-gray-400">Species Supported</div>
