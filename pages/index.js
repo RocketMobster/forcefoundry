@@ -118,7 +118,6 @@ const canonCount = Object.values(canonNamesData).flat().length;
 console.log(`Canon names loaded: ${canonNamesLoaded ? 'Yes' : 'No'}, count: ${canonCount}`);
 
 export default function Home() {
-  const [navOpen, setNavOpen] = useState(true);
   const [availableSpecies, setAvailableSpecies] = useState([]);
   const [selectedSpecies, setSelectedSpecies] = useState("Random");
   const [statSystem, setStatSystem] = useState("traditional");
@@ -135,642 +134,326 @@ export default function Home() {
       .then(data => setAvailableSpecies(data))
       .catch(() => setAvailableSpecies([]));
   }, []);
-  
+
   // Utility function to get a name from a specific species (or fallback to another)
   const getNameFromSpecies = (nameData, species, fallbackSpecies = 'Human/Common') => {
-    // Try the requested species first
     if (nameData[species] && nameData[species].length > 0) {
       return getRandom(nameData[species]);
     }
-    
-    // Fallback to specified fallback species
     if (nameData[fallbackSpecies] && nameData[fallbackSpecies].length > 0) {
       return getRandom(nameData[fallbackSpecies]);
     }
-    
-    // Last resort: use first available species
     const availableSpecies = Object.keys(nameData).find(key => nameData[key] && nameData[key].length > 0);
-    if (availableSpecies) {
-      return getRandom(nameData[availableSpecies]);
-    }
-    
-    // If all else fails, return a placeholder
-    return 'Unknown';
+    return availableSpecies ? getRandom(nameData[availableSpecies]) : '';
   };
 
-  // Function to generate a character
-  const generateCharacter = (fullRandom = false) => {
-    // Randomly generate character details
-    const gender = fullRandom ? getRandom(genders) : (character?.gender || getRandom(genders));
-    const charClass = fullRandom ? getRandom(classes) : (character?.charClass || 'Jedi');
-    const alignment = fullRandom ? getRandom(alignments) : (character?.alignment || getRandom(alignments));
-    const currentStatSystem = fullRandom ? statSystem : (character?.statSystem || statSystem);
-    
-    // Get species (random or specific)
-    let species;
-    if (selectedSpecies === "Random" || fullRandom) {
-      species = getRandom(availableSpecies);
-    } else {
-      species = selectedSpecies;
-    }
+  // All character/stat generation logic should be in functions/hooks above this line
 
-    // Get appropriate name data sets
-    let firstNameData, lastNameData;
-    if (gender === 'male') {
-      firstNameData = maleFirstNames;
-      lastNameData = maleLastNames;
-    } else if (gender === 'female') {
-      firstNameData = femaleFirstNames;
-      lastNameData = femaleLastNames;
-    } else {
-      // For 'other' gender, randomly pick from either male or female first names
-      firstNameData = Math.random() < 0.5 ? maleFirstNames : femaleFirstNames;
-      lastNameData = Math.random() < 0.5 ? maleLastNames : femaleLastNames;
-    }
-    
-    // Generate first and last name
-    let firstName = getNameFromSpecies(firstNameData, species);
-    let lastName = getNameFromSpecies(lastNameData, species);
-    
-    // Simple name generation (first + last) is default
-    let finalName = `${firstName} ${lastName}`;
-    
-    // Check if this species exists in all name files for potential variations
-    const speciesExistsInAllFiles = (
-      (maleFirstNames[species] && maleFirstNames[species].length > 0) &&
-      (femaleFirstNames[species] && femaleFirstNames[species].length > 0) &&
-      (maleLastNames[species] && maleLastNames[species].length > 0) &&
-      (femaleLastNames[species] && femaleLastNames[species].length > 0) &&
-      (otherNamesNeutral[species] && otherNamesNeutral[species].length > 0)
-    );
-    
-    // Add name variations (only if we have complete species data)
-    if (speciesExistsInAllFiles) {
-      const neutralNames = otherNamesNeutral[species] || [];
-      const nameChance = Math.random();
-      
-      if (nameChance < 0.05 && neutralNames.length > 0) {
-        // 5% chance: Middle name
-        const middleName = getRandom(neutralNames);
-        finalName = `${firstName} ${middleName} ${lastName}`;
-      } else if (nameChance < 0.1) {
-        // 5% chance: Hyphenated last name
-        const secondLastName = getNameFromSpecies(lastNameData, species);
-        finalName = `${firstName} ${lastName}-${secondLastName}`;
-      }
-    }
-    
-    // Generate stats based on class and system
-    const baseStats = statSystems[currentStatSystem][charClass].stats;
-    const stats = Object.fromEntries(
-      Object.entries(baseStats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
-    );
-    
-    // Add hitpoints for SWTOR system
-    if (currentStatSystem === 'swtor' && stats.endurance) {
-      stats.hitpoints = stats.endurance * 10;
-    }
-    
-    // Get homeworld type and name
-    const homeworldType = getRandom(homeworldTypes);
-    
-    // Fetch random planet from our planets list
-    const planets = require('../public/data/planets.json');
-    let homeworldName = planets[Math.floor(Math.random() * planets.length)];
-    
-    // Get equipment from class template
-    const equipment = [...statSystems[currentStatSystem][charClass].equipment];
-    
-    // Add lightsaber color for force users
-    const forceUser = statSystems[currentStatSystem][charClass].forceUser;
-    let lightsaberColor = null;
-    if (forceUser) {
-      if (charClass === "Jedi") {
-        lightsaberColor = getRandom(lightsaberColors.Jedi);
-      } else if (charClass === "Sith") {
-        lightsaberColor = getRandom(lightsaberColors.Sith);
-      } else if (alignment === "Gray") {
-        lightsaberColor = getRandom(lightsaberColors.Gray);
-      }
-    }
-    
-    // Create the character object with canon name detection
-    const newCharacter = {
-      name: finalName,
-      isCanon: isCanonName(finalName), // Add canon detection here
-      gender,
+
+  // Character generation logic
+  const generateCharacter = () => {
+    setLoading(true);
+    // Pick species
+    let species = selectedSpecies === "Random" ? getRandom(availableSpecies) : selectedSpecies;
+    // Pick class
+    let charClass = getRandom(classes);
+    // Pick alignment
+    let alignment = getRandom(alignments);
+    // Pick gender
+    let gender = getRandom(genders);
+    // Pick homeworld
+    let homeworldType = getRandom(homeworldTypes);
+    let homeworld = { name: homeworldType };
+    // Pick stats and equipment
+    let stats = statSystems[statSystem][charClass].stats;
+    let forceUser = statSystems[statSystem][charClass].forceUser;
+    let equipment = statSystems[statSystem][charClass].equipment;
+    // Pick lightsaber color if force user
+    let lightsaberColor = forceUser ? getRandom(lightsaberColors[charClass] || []) : null;
+    // Pick name
+    let name = getNameFromSpecies(maleFirstNames, species) + " " + getNameFromSpecies(maleLastNames, species);
+    // Compose character object
+    const characterObj = {
+      name,
       species,
       charClass,
       alignment,
-      homeworld: {
-        type: homeworldType,
-        name: homeworldName
-      },
+      gender,
+      homeworld,
       stats,
-      equipment,
       forceUser,
+      equipment,
       lightsaberColor,
-      statSystem: currentStatSystem,
       _created: Date.now()
     };
-    
-    // Set the character in state
-    setCharacter(newCharacter);
-    
-    // Generate portrait if enabled
-    if (aiPortraitEnabled) {
-      generateNewPortrait();
-    }
+    setCharacter(characterObj);
+    setLoading(false);
   };
 
-  const rerollStats = () => {
-    if (!character) return;
-    const { charClass, statSystem } = character;
-    const currentClasses = statSystems[statSystem];
-    const stats = Object.fromEntries(
-      Object.entries(currentClasses[charClass].stats).map(([k, base]) => [k, base + Math.floor(Math.random() * 3)])
-    );
-    // Add hitpoints for SWTOR system (endurance * 10)
-    if (statSystem === 'swtor' && stats.endurance) {
-      stats.hitpoints = stats.endurance * 10;
-    }
-    setCharacter({
-      ...character,
-      stats,
-    });
-  };
-
-  // Download character as JSON
-  const downloadJSON = () => {
-    if (!character) return;
-    const blob = new Blob([JSON.stringify(character, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${character.name.replace(/ /g, '_')}.json`;
-    a.click();
-  };
-
-  // Reroll character name
-  const rerollName = () => {
-    if (!character) return;
-    
-    // Use the existing character's gender and species for consistent name generation
-    const { gender, species: characterSpecies } = character;
-    
-    // Check if the species exists in all required JSON files for name variations
-    const speciesExistsInAllFiles = (
-      (maleFirstNames[characterSpecies] && maleFirstNames[characterSpecies].length > 0) &&
-      (femaleFirstNames[characterSpecies] && femaleFirstNames[characterSpecies].length > 0) &&
-      (maleLastNames[characterSpecies] && maleLastNames[characterSpecies].length > 0) &&
-      (femaleLastNames[characterSpecies] && femaleLastNames[characterSpecies].length > 0) &&
-      (otherNamesNeutral[characterSpecies] && otherNamesNeutral[characterSpecies].length > 0)
-    );
-
-    // Generate new names using the same logic as generateCharacter
-    let firstName, lastName;
-    if (gender === 'male') {
-      firstName = getNameFromSpecies(maleFirstNames, characterSpecies);
-      lastName = getNameFromSpecies(maleLastNames, characterSpecies);
-    } else if (gender === 'female') {
-      firstName = getNameFromSpecies(femaleFirstNames, characterSpecies);
-      lastName = getNameFromSpecies(femaleLastNames, characterSpecies);
-    } else {
-      // For 'other' gender, randomly pick from either male or female first names
-      const nameData = Math.random() < 0.5 ? maleFirstNames : femaleFirstNames;
-      const lastNameData = Math.random() < 0.5 ? maleLastNames : femaleLastNames;
-      firstName = getNameFromSpecies(nameData, characterSpecies);
-      lastName = getNameFromSpecies(lastNameData, characterSpecies);
-    }
-
-    // Simple name generation (no middle names or hyphenation unless species exists in all files)
-    let finalName = `${firstName} ${lastName}`;
-
-    // Only add variations if species exists in all files (same logic as generateCharacter)
-    if (speciesExistsInAllFiles) {
-      const neutralNames = otherNamesNeutral[characterSpecies] || [];
-      const variationChance = Math.random();
-      
-      if (variationChance < 0.05 && neutralNames.length > 0) {
-        // 5% chance: Middle name for character generator
-        const middleName = getRandom(neutralNames);
-        finalName = `${firstName} ${middleName} ${lastName}`;
-      }
-    }
-
-    // Update only the character's name, keeping everything else the same
-    setCharacter({
-      ...character,
-      name: finalName,
-      isCanon: isCanonName(finalName),
-      _reroll: Date.now()
-    });
-  };
-
-  // Generate a new portrait for an existing character
-  // TEMPORARILY DISABLED - Will be fixed in a future update
-  const generateNewPortrait = async () => {
-    // Early return - AI portrait generation is disabled
-    setPortraitError("AI portrait generation is temporarily disabled.");
-    return;
-    
-    // The code below is preserved for future use
-    if (!character) return;
-    setPortraitError(null); // Clear error at start
+  // Full random character logic
+  const generateFullRandomCharacter = () => {
     setLoading(true);
-    let didTimeout = false;
-    
-    // Timeout after 40 seconds
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => {
-        didTimeout = true;
-        reject(new Error('Portrait generation timed out. The Replicate API may be slow or unavailable.'));
-      }, 40000)
-    );
-    
-    const fetchPortrait = async () => {
-      try {
-        const prompt = `${character.gender} ${character.species} ${character.charClass} from Star Wars, portrait style, detailed face, ${character.alignment} alignment, professional character art`;
-        const res = await fetch(getResourceUrl('/api/replicate'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt })
-        });
-        
-        if (!res.ok) {
-          let errorText;
-          let rawOutput = null;
-          try {
-            const data = await res.json();
-            errorText = data.error || JSON.stringify(data);
-            rawOutput = data.rawOutput;
-          } catch (e) {
-            errorText = await res.text();
-          }
-          throw new Error(`API Error: ${res.status} - ${res.statusText}: ${errorText}${rawOutput ? `\nRaw Output: ${JSON.stringify(rawOutput)}` : ''}`);
-        }
-        
-        const data = await res.json();
-        const imageUrl = data.imageUrl;
-        
-        if (typeof imageUrl !== 'string' || !imageUrl.startsWith('http')) {
-          throw new Error(`Portrait API did not return a valid image URL.\nReturned: ${JSON.stringify(imageUrl)}\nRaw Output: ${JSON.stringify(data.rawOutput)}`);
-        }
-        
-        setCharacter(prev => prev ? {
-          ...prev,
-          image: imageUrl,
-          imageError: null
-        } : prev);
-        
-        setPortraitError(null);
-      } catch (error) {
-        console.error('Portrait generation error:', error.message || error);
-        setCharacter(prev => {
-          if (!prev) return null;
-          return {
-            ...prev,
-            image: null,
-            imageError: error.message || 'Unknown error'
-          };
-        });
-        setPortraitError(error.message || 'Unknown error');
-      }
+    // Pick everything randomly
+    let species = getRandom(availableSpecies);
+    let charClass = getRandom(classes);
+    let alignment = getRandom(alignments);
+    let gender = getRandom(genders);
+    let homeworldType = getRandom(homeworldTypes);
+    let homeworld = { name: homeworldType };
+    let statSystemKey = getRandom(Object.keys(statSystems));
+    let stats = statSystems[statSystemKey][charClass].stats;
+    let forceUser = statSystems[statSystemKey][charClass].forceUser;
+    let equipment = statSystems[statSystemKey][charClass].equipment;
+    let lightsaberColor = forceUser ? getRandom(lightsaberColors[charClass] || []) : null;
+    let name = getNameFromSpecies(maleFirstNames, species) + " " + getNameFromSpecies(maleLastNames, species);
+    const characterObj = {
+      name,
+      species,
+      charClass,
+      alignment,
+      gender,
+      homeworld,
+      stats,
+      forceUser,
+      equipment,
+      lightsaberColor,
+      _created: Date.now()
     };
-    
-    try {
-      await Promise.race([fetchPortrait(), timeoutPromise]);
-    } catch (error) {
-      console.error('Portrait generation error:', error.message || error);
-      setCharacter(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          image: null,
-          imageError: error.message || 'Unknown error'
-        };
-      });
-      setPortraitError(error.message || 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
+    setCharacter(characterObj);
+    setLoading(false);
   };
-  
+
+  // Only one return statement below, containing all JSX
   return (
-    <div className="min-h-screen bg-gray-900 text-white font-sans">
-      <main className="max-w-screen-sm mx-auto w-full px-2 py-2">
-        {/* Header matching screenshot */}
-        <header className="w-full bg-gray-800 shadow-md py-3 mb-8">
-          <div className="max-w-4xl mx-auto flex items-center justify-between px-6">
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-400 text-2xl">⚡</span>
-              <span className="text-2xl font-extrabold tracking-wider text-white">ForceFoundry</span>
-            </div>
-            {/* Navigation moved to floating container below header for mobile UX */}
+    <main className="max-w-4xl mx-auto px-6 pb-16">
+      {mode === 'character' ? (
+        <>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold mb-2">Character Generator</h2>
+            <p className="text-gray-400">Create detailed Star Wars characters with stats and backgrounds</p>
           </div>
-        </header>
-        
-        {/* Main content */}
-      {/* Retractable floating navigation container for mobile and desktop */}
-      {/* Handle to open/close nav - always visible at left edge, outside nav */}
-      <button
-        className="fixed" style={{ top: '140px', left: 0, zIndex: 40, backgroundColor: '#f59e42', color: 'white', borderRadius: '0 0.75rem 0.75rem 0', padding: '0.5rem 0.5rem', minWidth: '32px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', display: 'flex', alignItems: 'center' }}
-        onClick={() => setNavOpen(v => !v)}
-        aria-label={navOpen ? 'Hide navigation' : 'Show navigation'}
-      >
-        {navOpen ? <FaChevronLeft /> : <FaChevronRight />}
-      </button>
-      <div
-        className="fixed top-20 left-0 z-30 w-[180px] flex flex-col md:flex-row items-center gap-2 p-2 bg-gray-800 bg-opacity-95 rounded-xl shadow-lg border border-gray-700 mb-4 transition-transform duration-300"
-        style={{ minHeight: '56px', transform: navOpen ? 'translateX(0)' : 'translateX(-148px)' }}
-      >
-        {/* Nav content */}
-        <div className={`flex flex-col md:flex-row items-center gap-2 w-[180px] md:w-auto transition-all duration-300 ${navOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} style={{ alignItems: 'flex-start' }}>
-          <button
-            className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 w-full md:w-auto ${mode === 'character' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
-            onClick={() => setMode('character')}
-          >
-            <span role="img" aria-label="character">🧑‍🎤</span> Character Generator
-          </button>
-          <button
-            className={`flex items-center gap-2 px-4 py-2 rounded font-semibold transition-colors duration-150 w-full md:w-auto ${mode === 'name' ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-blue-700'}`}
-            onClick={() => setMode('name')}
-          >
-            <span role="img" aria-label="name">📝</span> Name Generator
-          </button>
-          <a
-            href={getInternalLink('info')}
-            className="p-2 rounded-full bg-gray-700 hover:bg-blue-600 text-white transition-colors duration-150"
-            title="Information"
-          >
-            <span role="img" aria-label="info">ℹ️</span>
-          </a>
-        </div>
-        {/* Note now inside slider body, bottom right next to info button */}
-        {navOpen && (
-          <div className="absolute bottom-2 right-2 flex items-end justify-end w-full pr-2" style={{ pointerEvents: 'none' }}>
-            <span className="text-xs text-blue-400 text-right" style={{ fontSize: '0.75rem', marginLeft: '2.5rem' }}>
-              Click Flag to Open/Close Navigation
-            </span>
+          <div className="max-w-md mx-auto mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-2">Species Selection:</label>
+            <select
+              value={selectedSpecies}
+              onChange={(e) => setSelectedSpecies(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+            >
+              <option value="Random">Random Species</option>
+              {availableSpecies.sort().map(species => (
+                <option key={species} value={species}>{species}</option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">Select a specific species or choose "Random" for variety</p>
           </div>
-        )}
-      </div>
-      <main className="max-w-4xl mx-auto px-6 pb-16">
-          {mode === 'character' ? (
+          <div className="max-w-md mx-auto mb-6">
+            <label className="block text-sm font-medium text-gray-300 mb-2">Stat System:</label>
+            <select
+              value={statSystem}
+              onChange={(e) => setStatSystem(e.target.value)}
+              className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+            >
+              <option value="traditional">Traditional RPG (Str, Agi, Int, Wis, Cha, Con)</option>
+              <option value="swtor">Star Wars: The Old Republic (Str, End, Aim, Cun, Will, HP)</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              {statSystem === 'traditional' 
+                ? 'Classic D&D-style attributes for general RPG systems'
+                : 'SWTOR-specific stats with hitpoints calculated from endurance (x10)'}
+            </p>
+          </div>
+          <div className="max-w-md mx-auto mb-6 flex items-center gap-4">
+            <label className="block text-sm font-medium text-gray-300 mb-2">AI Portrait Generation:</label>
+            <span className="text-yellow-400 font-bold">[TEMPORARILY DISABLED]</span>
+            <input type="checkbox" checked={aiPortraitEnabled} disabled className="ml-2" />
+          </div>
+          {/* Show original buttons only if no character is generated */}
+          {!character && (
             <>
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold mb-2">Character Generator</h2>
-                <p className="text-gray-400">Create detailed Star Wars characters with stats and backgrounds</p>
-              </div>
-              
-              {/* Species Selection */}
-              <div className="max-w-md mx-auto mb-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Species Selection:
-                </label>
-                <select
-                  value={selectedSpecies}
-                  onChange={(e) => setSelectedSpecies(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="Random">Random Species</option>
-                  {availableSpecies.sort().map(species => (
-                    <option key={species} value={species}>{species}</option>
-                  ))}
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  Select a specific species or choose "Random" for variety
-                </p>
-              </div>
-
-              {/* Stat System Toggle */}
-              <div className="max-w-md mx-auto mb-6">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Stat System:
-                </label>
-                <select
-                  value={statSystem}
-                  onChange={(e) => setStatSystem(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-                >
-                  <option value="traditional">Traditional RPG (Str, Agi, Int, Wis, Cha, Con)</option>
-                  <option value="swtor">Star Wars: The Old Republic (Str, End, Aim, Cun, Will, HP)</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {statSystem === 'traditional' 
-                    ? 'Classic D&D-style attributes for general RPG systems'
-                    : 'SWTOR-specific stats with hitpoints calculated from endurance (x10)'
-                  }
-                </p>
-              </div>
-
-              {/* AI Portrait Toggle - TEMPORARILY DISABLED */}
-              <div className="max-w-md mx-auto mb-6">
-                <label className="flex items-center justify-between text-sm font-medium text-gray-300">
-                  <span>AI Portrait Generation:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-yellow-500 text-xs font-medium">[TEMPORARILY DISABLED]</span>
-                    <button
-                      disabled={true}
-                      className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors duration-200 bg-gray-700 cursor-not-allowed opacity-60"
-                    >
-                      <span
-                        className="inline-block w-4 h-4 transform bg-white rounded-full transition-transform duration-200 translate-x-1"
-                      />
-                    </button>
-                  </div>
-                </label>
-                <p className="text-xs text-gray-500 mt-1">
-                  AI portrait generation is currently disabled due to API limitations.
-                  <span className="text-yellow-400 ml-1">Feature will be fixed in a future update.</span>
-                </p>
-              </div>
-
-              <div className="flex flex-col w-full gap-2 md:flex-row md:w-auto md:gap-4 mb-6 justify-center items-stretch">
+              <div className="max-w-md mx-auto mb-6 flex flex-col gap-4 md:flex-row md:gap-4">
                 <button
-                  onClick={() => generateCharacter(false)}
-                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
-                  title={character ? `Generate another ${character.gender} ${character.charClass} (keeps current species and settings)` : "Generate a Male Jedi"}
+                  className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium text-white md:mr-2"
+                  disabled={loading}
+                  onClick={generateCharacter}
                 >
-                  <span>🔄</span>
-                  {character ? "Same Type" : "Generate Character"}
+                  Generate Character
                 </button>
                 <button
-                  onClick={() => generateCharacter(true)}
-                  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
-                  title="Randomizes everything: gender, class, species, and all attributes. Use this to start completely fresh."
+                  className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium text-white"
+                  disabled={loading}
+                  onClick={generateFullRandomCharacter}
                 >
-                  <span>🎲</span>
                   New Character (Full Random)
                 </button>
-                {character && (
-                  <button
-                    onClick={rerollStats}
-                    className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
-                    title="Reroll stats only (keep name, species, class, portrait, etc.)"
-                  >
-                    <span>🧮</span>
-                    Reroll Stats
-                  </button>
-                )}
-                {character && (
-                  <>
-                    <button
-                      onClick={rerollName}
-                      className="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
-                      title="Generate a new name for this character"
-                    >
-                      <span>🎲</span>
-                      Reroll Name
-                    </button>
-                    {/* New Portrait button removed - AI portrait generation temporarily disabled */}
-                    <button
-                      onClick={downloadJSON}
-                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded flex items-center gap-2 w-full md:w-auto"
-                    >
-                      <span>💾</span>
-                      Download JSON
-                    </button>
-                  </>
-                )}
               </div>
-
-              {/* Button explanations */}
-              <div className="text-center text-sm text-gray-400 mb-6">
-                {character ? (
-                  <div className="space-y-1">
-                    <p><span className="text-blue-400">🔄 Same Type:</span> Generate another {character.gender} {character.charClass}</p>
-                    <p><span className="text-purple-400">🎲 New Character:</span> Randomize everything (gender, class, etc.)</p>
-                    <p><span className="text-orange-400">🎲 Reroll Name:</span> Generate a new name for this character</p>
-                    {aiPortraitEnabled && (
-                      <p><span className="text-purple-400">🖼️ New Portrait:</span> Generate a new AI portrait</p>
-                    )}
-                  </div>
-                ) : (
-                  <p>Click <span className="text-blue-400">Generate Character</span> to create your first Star Wars character!</p>
-                )}
+              <div className="max-w-md mx-auto mb-6 text-center text-sm text-blue-300">
+                Click <span className="font-bold text-blue-200">Generate Character</span> to create your first Star Wars character!
               </div>
-
-              {loading && (
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-80">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-400 border-opacity-50 mb-6"></div>
-                  <div className="text-2xl font-bold mb-2 text-white">Generating character...</div>
-                  <div className="text-sm text-gray-300 mb-2">Please wait.</div>
-                </div>
-              )}
-
-              {/* Always show portrait error at the top if present */}
-              {portraitError && !loading && (
-                <div className="max-w-xl mx-auto bg-gray-900 rounded-xl p-4 shadow-md border border-red-500 mb-6">
-                  <div className="text-center">
-                    <div className="text-red-400 text-xs mb-1 font-bold">Portrait generation failed:</div>
-                    <div className="text-red-300 text-xs whitespace-pre-wrap break-all" style={{ maxWidth: '32rem', margin: '0 auto' }}>{portraitError}</div>
-                    <button
-                      className="mt-2 px-2 py-1 bg-gray-700 text-xs text-gray-200 rounded hover:bg-gray-600 border border-gray-500"
-                      onClick={() => {
-                        navigator.clipboard.writeText(portraitError);
-                      }}
-                    >Copy Error</button>
-                    {aiPortraitEnabled && (
-                      <div className="text-yellow-400 text-xs mt-1">
-                        Try the "🖼️ New Portrait" button or disable AI portraits
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Character display will go here */}
-              {character && !loading && (
-                <div className="mt-8">
-                  {/* Character card display */}
-                  <div className={`max-w-2xl mx-auto bg-gray-800 rounded-xl overflow-hidden shadow-lg ${character.isCanon ? 'border-2 border-yellow-400' : 'border border-gray-700'}`}>
-                    <div className="md:flex">
-                      <div className="md:flex-shrink-0 relative">
-                        {character.image ? (
-                          <img
-                            className="h-48 w-full object-cover md:h-full md:w-48"
-                            src={character.image}
-                            alt={character.name}
-                          />
-                        ) : (
-                          <div className="h-48 w-full md:h-full md:w-48 bg-gray-700 flex items-center justify-center">
-                            <div className="text-center p-4">
-                              <div className="text-4xl mb-2">
-                                {character.charClass === 'Jedi' ? '🧙‍♂️' :
-                                 character.charClass === 'Sith' ? '🦹‍♂️' :
-                                 character.charClass === 'Bounty Hunter' ? '🏹' :
-                                 character.charClass === 'Smuggler' ? '🚀' : '👤'}
-                              </div>
-                              <div className="text-sm text-gray-300">{character.charClass}</div>
-                            </div>
-                          </div>
-                        )}
-                        {character.isCanon && (
-                          <div className="absolute top-2 left-2">
-                            <span className="text-yellow-300 text-xl">★</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="p-6">
-                        <div className="mb-2">
-                          <h2 className="text-2xl font-bold">{character.name}</h2>
-                          {character.isCanon && (
-                            <p className="text-sm text-yellow-400">Canon Star Wars character name</p>
-                          )}
-                          <div className="text-gray-400 text-sm mb-4">
-                            {character.species} {character.gender} {character.charClass} • {character.alignment}
-                          </div>
-                        </div>
-                        
-                        <div className="mb-4">
-                          <h3 className="text-lg font-medium mb-2 text-blue-400">Stats</h3>
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-                            {Object.entries(character.stats).map(([stat, value]) => (
-                              <div key={stat} className="bg-gray-700 rounded p-2">
-                                <span className="text-gray-400 capitalize">{stat}: </span>
-                                <span className="font-medium">{value}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        
-                        <div className="mb-4">
-                          <h3 className="text-lg font-medium mb-2 text-blue-400">Equipment</h3>
-                          <ul className="list-disc list-inside text-sm">
-                            {character.equipment.map((item, index) => (
-                              <li key={index} className="text-gray-300">{item}</li>
-                            ))}
-                            {character.forceUser && character.lightsaberColor && (
-                              <li className="text-gray-300">
-                                <span className={`text-${character.lightsaberColor === 'red' ? 'red' : 
-                                                        character.lightsaberColor === 'blue' ? 'blue' : 
-                                                        character.lightsaberColor === 'green' ? 'green' : 
-                                                        character.lightsaberColor === 'purple' ? 'purple' : 'yellow'}-400`}>
-                                  {character.lightsaberColor.charAt(0).toUpperCase() + character.lightsaberColor.slice(1)}
-                                </span> lightsaber crystal
-                              </li>
-                            )}
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <h3 className="text-lg font-medium mb-2 text-blue-400">Homeworld</h3>
-                          <p className="text-sm text-gray-300">
-                            {character.homeworld.name || 'Unknown'} ({character.homeworld.type})
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </>
-          ) : (
-            <NameGenerator />
           )}
-        </main>
-      </main>
-    </div>
+          {/* Show advanced action buttons only if a character is generated */}
+          {character && (
+            <>
+              {/* Action buttons above character card */}
+              <div className="max-w-lg mx-auto mt-8 mb-2 grid grid-cols-1 gap-2 md:grid-cols-5 md:gap-3 justify-center items-center">
+                <button
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  title="Same Type"
+                  onClick={() => {
+                    setLoading(true);
+                    let species = getRandom(availableSpecies);
+                    let charClass = character.charClass;
+                    let alignment = character.alignment;
+                    let gender = character.gender;
+                    let homeworldType = getRandom(homeworldTypes);
+                    let homeworld = { name: homeworldType };
+                    let stats = statSystems[statSystem][charClass].stats;
+                    let forceUser = statSystems[statSystem][charClass].forceUser;
+                    let equipment = statSystems[statSystem][charClass].equipment;
+                    let lightsaberColor = forceUser ? getRandom(lightsaberColors[charClass] || []) : null;
+                    let name = getNameFromSpecies(maleFirstNames, species) + " " + getNameFromSpecies(maleLastNames, species);
+                    setCharacter({
+                      name,
+                      species,
+                      charClass,
+                      alignment,
+                      gender,
+                      homeworld,
+                      stats,
+                      forceUser,
+                      equipment,
+                      lightsaberColor,
+                      _created: Date.now()
+                    });
+                    setLoading(false);
+                  }}
+                >
+                  <span>🔄</span>
+                  <span>Same Type</span>
+                </button>
+                <button
+                  className="bg-purple-600 hover:bg-purple-700 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  title="New Character (Full Random)"
+                  onClick={generateFullRandomCharacter}
+                >
+                  <span>🎲</span>
+                  <span>New Character<br/>(Full Random)</span>
+                </button>
+                <button
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  title="Reroll Stats"
+                  onClick={() => {
+                    setLoading(true);
+                    // Reroll only stats for current class and stat system
+                    let stats = {...statSystems[statSystem][character.charClass].stats};
+                    // Actually randomize stats for each stat key
+                    Object.keys(stats).forEach(key => {
+                      stats[key] = Math.floor(Math.random() * 6) + 10; // Example: random value between 10-15
+                    });
+                    setCharacter({
+                      ...character,
+                      stats,
+                      _created: Date.now()
+                    });
+                    setLoading(false);
+                  }}
+                >
+                  <span>🎲</span>
+                  <span>Reroll Stats</span>
+                </button>
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  title="Reroll Name"
+                  onClick={() => {
+                    let name = getNameFromSpecies(maleFirstNames, character.species) + " " + getNameFromSpecies(maleLastNames, character.species);
+                    setCharacter({
+                      ...character,
+                      name,
+                      _created: Date.now()
+                    });
+                  }}
+                >
+                  <span>🎲</span>
+                  <span>Reroll Name</span>
+                </button>
+                <button
+                  className="bg-green-600 hover:bg-green-700 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  title="Download JSON"
+                  onClick={() => {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(character, null, 2));
+                    const downloadAnchorNode = document.createElement('a');
+                    downloadAnchorNode.setAttribute("href", dataStr);
+                    downloadAnchorNode.setAttribute("download", `${character.name.replace(/\s+/g, '_')}_character.json`);
+                    document.body.appendChild(downloadAnchorNode);
+                    downloadAnchorNode.click();
+                    downloadAnchorNode.remove();
+                  }}
+                >
+                  <span>💾</span>
+                  <span>Download JSON</span>
+                </button>
+              </div>
+              {/* Explanation text below buttons */}
+              <div className="max-w-lg mx-auto mb-4 mt-2 text-sm text-blue-200">
+                <div className="flex flex-col gap-1">
+                  <span>🔄 <b>Same Type:</b> Generate another {character.gender} {character.charClass}</span>
+                  <span>🎲 <b>New Character:</b> Randomize everything (gender, class, etc.)</span>
+                  <span>🎲 <b>Reroll Name:</b> Generate a new name for this character</span>
+                </div>
+              </div>
+              {/* Character Card Display */}
+              <div className="max-w-lg mx-auto bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
+                {/* Portrait area with default class icon */}
+                <div className="flex justify-center items-center mb-4">
+                  {(() => {
+                    switch (character.charClass) {
+                      case 'Jedi':
+                        return <span className="text-blue-400 text-5xl" title="Jedi">🧑‍🚀</span>;
+                      case 'Sith':
+                        return <span className="text-red-500 text-5xl" title="Sith">🦹‍♂️</span>;
+                      case 'Bounty Hunter':
+                        return <span className="text-green-400 text-5xl" title="Bounty Hunter">🤠</span>;
+                      case 'Smuggler':
+                        return <span className="text-yellow-400 text-5xl" title="Smuggler">🕵️‍♂️</span>;
+                      default:
+                        return <span className="text-gray-400 text-5xl" title="Character">🧑‍🎤</span>;
+                    }
+                  })()}
+                </div>
+                {/* Gender display */}
+                <h3 className="text-xl font-bold mb-2 text-yellow-300">{character.name}</h3>
+                {/* ...existing code... */}
+                <div className="mb-2 text-gray-300">{character.species} &mdash; {character.charClass}</div>
+                <div className="mb-2 text-gray-400">Gender: <span className={
+                  character.gender === 'male' ? 'font-semibold text-blue-400' :
+                  character.gender === 'female' ? 'font-semibold text-pink-400' :
+                  'font-semibold text-gray-400'
+                }>{character.gender ? (character.gender.charAt(0).toUpperCase() + character.gender.slice(1)) : 'Unknown'}</span></div>
+                <div className="mb-2 text-gray-400">Alignment: <span className="font-semibold text-blue-400">{character.alignment}</span></div>
+                <div className="mb-2 text-gray-400">Homeworld: <span className="font-semibold text-green-400">{character.homeworld?.name}</span></div>
+                <div className="mb-2 text-gray-400">Force User: <span className="font-semibold text-purple-400">{character.forceUser ? 'Yes' : 'No'}</span></div>
+                {character.lightsaberColor && (
+                  <div className="mb-2 text-gray-400">Lightsaber Color: <span className="font-semibold" style={{ color: character.lightsaberColor }}>{character.lightsaberColor}</span></div>
+                )}
+                <div className="mb-2 text-gray-400">Equipment: <span className="font-semibold text-gray-200">{character.equipment?.join(', ')}</span></div>
+                <div className="mb-2 text-gray-400">Stats:</div>
+                <ul className="grid grid-cols-2 gap-2 text-xs text-gray-200 mb-2">
+                  {character.stats && Object.entries(character.stats).map(([stat, value]) => (
+                    <li key={stat} className="flex justify-between"><span className="font-semibold text-gray-400">{stat}</span> <span>{value}</span></li>
+                  ))}
+                  {/* Show HP for SWTOR stats */}
+                  {statSystem === 'swtor' && character.stats.endurance && (
+                    <li className="flex justify-between"><span className="font-semibold text-gray-400">HP</span> <span>{character.stats.endurance * 10}</span></li>
+                  )}
+                </ul>
+                <div className="mt-2 text-xs text-gray-500">Generated: {new Date(character._created).toLocaleString()}</div>
+              </div>
+            </>
+          )}
+        </>
+      ) : (
+        <NameGenerator />
+      )}
+    </main>
   );
 }

@@ -1,4 +1,23 @@
 # [2.3.2] - 2025-07-22
+# [2.4.0] - 2025-07-23
+
+### 🚀 Major Structural & UI Overhaul
+
+- **REFACTORED**: Main file and page structure for clarity and maintainability
+- **FIXED**: Duplicate navigation menu rendering on info page and other pages
+- **IMPROVED**: Navigation menu now always animates smoothly and retracts correctly
+- **RESTORED**: Advanced character generator UI and logic, including action buttons and mobile spacing
+- **ENHANCED**: Gender display and color labeling in generator and name cards
+- **FIXED**: Star icon placement for canon/famous family name cards
+- **IMPROVED**: Clipboard copy logic with robust fallback and toast feedback
+- **CLEANED**: Removed duplicate UI elements and redundant Layout wrappers
+- **UPDATED**: Info page JSX structure for correct rendering and compilation
+- **IMPROVED**: Responsive design and spacing across all pages
+- **UPDATED**: All pages now use shared Layout via _app.js for consistent navigation
+- **FIXED**: Compilation errors due to JSX and closing tag issues
+- **UPDATED**: Internal link logic for navigation
+
+---
 
 ### 🛠 Minor UI & Routing Fixes
 

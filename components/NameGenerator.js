@@ -754,7 +754,7 @@ export default function NameGenerator() {
   };
 
   return (
-    <div className="max-w-screen-sm mx-auto w-full px-2 py-2">
+    <div className="min-w-md max-w-lg mx-auto w-full px-2 py-2">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-2">Name Generator</h2>
         <p className="text-gray-400">Create Star Wars character names for your adventures</p>
@@ -887,9 +887,19 @@ export default function NameGenerator() {
                 'border border-gray-700'
               } hover:shadow-lg transition-shadow relative min-h-[120px]`}
             >
-              <div className="text-gray-500 text-xs absolute top-2 left-3">
-                #{index + 1}
-              </div>
+              <div className="text-gray-500 text-xs absolute top-2 left-3 font-mono">#{index + 1}</div>
+              {/* Top right: gender then star(s), with padding, for canon and famous family cards */}
+              {(name.isCanon || name.isFamousFamily) && (
+                <div className="absolute top-2 right-2 flex items-center">
+                  <span className="text-gray-400 text-xs font-mono mr-2" style={{paddingRight:'0.25rem'}}>{name.gender ? (name.gender.charAt(0).toUpperCase() + name.gender.slice(1)) : 'Unknown'}</span>
+                  {name.isCanon && <span className="text-yellow-300 text-lg">★</span>}
+                  {name.isFamousFamily && <span className="text-gray-400 text-lg">✧</span>}
+                </div>
+              )}
+              {/* For non-canon/non-famous cards, show gender in top right as before */}
+              {(!name.isCanon && !name.isFamousFamily) && (
+                <div className="text-gray-500 text-xs absolute top-2 right-3 font-mono">{name.gender ? (name.gender.charAt(0).toUpperCase() + name.gender.slice(1)) : 'Unknown'}</div>
+              )}
               <div className={`flex flex-col justify-center ${
                 name.isCanon ? "rounded-lg p-2 bg-yellow-900 bg-opacity-10" : 
                 name.isFamousFamily ? "rounded-lg p-2 bg-gray-700 bg-opacity-10" : 
@@ -898,9 +908,14 @@ export default function NameGenerator() {
                 <h3 className={`text-lg font-bold mb-1 line-height-1 mt-4 ${
                   name.isFamousFamily ? "text-gray-300" : ""
                 }`}>
+                  {/* Left star(s) */}
                   {name.isCanon && <span className="text-yellow-300 mr-1">★</span>}
                   {name.isFamousFamily && <span className="text-gray-400 mr-1">✧</span>}
+                  {/* Name */}
                   {name.name}
+                  {/* Right star(s) */}
+                  {name.isCanon && <span className="text-yellow-300 ml-2">★</span>}
+                  {name.isFamousFamily && <span className="text-gray-400 ml-2">✧</span>}
                 </h3>
                 <div className="mt-1">
                   <span className="bg-purple-800 text-white text-xs px-2 py-1 rounded-full">
@@ -959,7 +974,52 @@ export default function NameGenerator() {
                 
                 <div className="mt-3 flex gap-2">
                   <button 
-                    onClick={() => navigator.clipboard.writeText(name.name)} 
+                    onClick={() => {
+                      // Use a fallback for clipboard if navigator.clipboard fails
+                      const text = name.name;
+                      let success = false;
+                      if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text).then(() => {
+                          success = true;
+                          showToast('Name copied!');
+                        }, () => {
+                          fallbackCopyTextToClipboard(text);
+                        });
+                      } else {
+                        fallbackCopyTextToClipboard(text);
+                      }
+                      function fallbackCopyTextToClipboard(text) {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        textarea.style.position = 'fixed';
+                        textarea.style.left = '-9999px';
+                        document.body.appendChild(textarea);
+                        textarea.focus();
+                        textarea.select();
+                        try {
+                          document.execCommand('copy');
+                          showToast('Name copied!');
+                        } catch (err) {
+                          alert('Copy failed: Clipboard permissions are blocked by your browser.');
+                        }
+                        document.body.removeChild(textarea);
+                      }
+                      function showToast(msg) {
+                        const toast = document.createElement('div');
+                        toast.textContent = msg;
+                        toast.style.position = 'fixed';
+                        toast.style.bottom = '32px';
+                        toast.style.left = '50%';
+                        toast.style.transform = 'translateX(-50%)';
+                        toast.style.background = '#222';
+                        toast.style.color = '#fff';
+                        toast.style.padding = '8px 16px';
+                        toast.style.borderRadius = '8px';
+                        toast.style.zIndex = '9999';
+                        document.body.appendChild(toast);
+                        setTimeout(() => { toast.remove(); }, 1500);
+                      }
+                    }} 
                     className="text-gray-400 hover:text-white" 
                     title="Copy name"
                   >
@@ -968,7 +1028,51 @@ export default function NameGenerator() {
                     </svg>
                   </button>
                   <button 
-                    onClick={() => navigator.clipboard.writeText(`${name.name} (${name.gender === 'male' ? 'Male' : 'Female'}, ${name.species})`)} 
+                    onClick={() => {
+                      const details = `Name: ${name.name}\nSpecies: ${name.species}\nGender: ${name.gender ? (name.gender.charAt(0).toUpperCase() + name.gender.slice(1)) : 'Unknown'}`;
+                      let success = false;
+                      if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(details).then(() => {
+                          success = true;
+                          showToast('Full details copied!');
+                        }, () => {
+                          fallbackCopyTextToClipboard(details);
+                        });
+                      } else {
+                        fallbackCopyTextToClipboard(details);
+                      }
+                      function fallbackCopyTextToClipboard(text) {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        textarea.style.position = 'fixed';
+                        textarea.style.left = '-9999px';
+                        document.body.appendChild(textarea);
+                        textarea.focus();
+                        textarea.select();
+                        try {
+                          document.execCommand('copy');
+                          showToast('Full details copied!');
+                        } catch (err) {
+                          alert('Copy failed: Clipboard permissions are blocked by your browser.');
+                        }
+                        document.body.removeChild(textarea);
+                      }
+                      function showToast(msg) {
+                        const toast = document.createElement('div');
+                        toast.textContent = msg;
+                        toast.style.position = 'fixed';
+                        toast.style.bottom = '32px';
+                        toast.style.left = '50%';
+                        toast.style.transform = 'translateX(-50%)';
+                        toast.style.background = '#222';
+                        toast.style.color = '#fff';
+                        toast.style.padding = '8px 16px';
+                        toast.style.borderRadius = '8px';
+                        toast.style.zIndex = '9999';
+                        document.body.appendChild(toast);
+                        setTimeout(() => { toast.remove(); }, 1500);
+                      }
+                    }} 
                     className="text-gray-400 hover:text-white" 
                     title="Copy full details"
                   >
@@ -979,9 +1083,8 @@ export default function NameGenerator() {
                 </div>
                 {name.isCanon && <p className="text-xs text-yellow-400 mt-1 font-semibold">Canon Star Wars character name</p>}
                 {name.isFamousFamily && <p className="text-xs text-gray-400 mt-1 font-semibold">Famous Star Wars Family</p>}
-                {name.isCanon && <div className="absolute top-2 right-2">
-                  <span className="text-yellow-300 text-lg">★</span>
-                </div>}
+                {/* Removed gold star under gender in top right for canon names */}
+                {/* Keep famous family icon in top right if needed */}
                 {name.isFamousFamily && <div className="absolute top-2 right-2">
                   <span className="text-gray-400 text-lg">✧</span>
                 </div>}

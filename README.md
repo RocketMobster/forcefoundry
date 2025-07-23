@@ -41,10 +41,25 @@ A comprehensive **Star Wars character and name generation tool** built with **Ne
 - **Bulk Generation**: Generate multiple names at once
 
 ### 🛡️ Robust Features
-- **Smart Fallback System**: Graceful handling of incomplete species data
-- **Error Prevention**: No cross-species contamination in names
-- **Responsive Design**: Works on desktop and mobile
-- **Offline Capable**: No external API dependencies
+**Smart Fallback System**: Graceful handling of incomplete species data
+**Error Prevention**: No cross-species contamination in names
+**Responsive Design**: Works on desktop and mobile
+**Offline Capable**: No external API dependencies
+**Animated Navigation**: Single nav menu with smooth sliding animation
+**Advanced Generator UI**: Action buttons, gender color labels, and improved mobile spacing
+
+A major update (v2.4.0) includes:
+- Refactored main file and page structure for maintainability
+- Fixed duplicate navigation menu rendering and improved nav animation
+- Restored advanced character generator UI and logic
+- Enhanced gender display and color labeling
+- Fixed star icon placement for canon/famous family name cards
+- Improved clipboard copy logic with robust fallback and toast feedback
+- Removed duplicate UI elements and redundant Layout wrappers
+- Updated info page JSX structure for correct rendering
+- Improved responsive design and spacing
+- All pages now use shared Layout via _app.js for consistent navigation
+- Fixed compilation errors due to JSX and closing tag issues
 
 ## 🛠️ Local Development
 
