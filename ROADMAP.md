@@ -1,4 +1,12 @@
 # 🌌 ForceFoundry Development Roadmap
+# 🚩 Immediate Next Steps
+
+- Remove the AI image portrait functionality entirely, including the toggle and note on the character generator page.
+- Add a button to the character generator that copies a generated character in a format suitable for pasting into external AI image generators (e.g., Stable Diffusion, Midjourney) to create a portrait outside the app.
+
+# 🔮 Future Considerations
+
+- Possibly add a portrait function that pulls a random portrait JPG or PNG from a data folder for the character's class and species and displays it. This is a potential feature under consideration.
 
 ## 📋 Short-Term Goals (v2.1.0)
 
