@@ -3,6 +3,7 @@
 
 - Remove the AI image portrait functionality entirely, including the toggle and note on the character generator page.
 - Add a button to the character generator that copies a generated character in a format suitable for pasting into external AI image generators (e.g., Stable Diffusion, Midjourney) to create a portrait outside the app.
+- Add a function to detect device type on app load and adjust navigation/menu placement and other UI elements for desktop computers versus mobile devices (current design is mobile-optimized).
 
 # 🔮 Future Considerations
 
