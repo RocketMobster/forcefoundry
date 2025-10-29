@@ -203,17 +203,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Migration Notes
 
+
+## Roadmap
+
+### Immediate Next Steps
+- Remove the AI image portrait functionality entirely, including the toggle and note on the character generator page.
+- Add a button to the character generator that copies a generated character in a format suitable for pasting into external AI image generators (e.g., Stable Diffusion, Midjourney) to create a portrait outside the app.
+
+### Future Considerations
+- Possibly add a portrait function that pulls a random portrait JPG or PNG from a data folder for the character's class and species and displays it. This is a potential feature under consideration.
+
 ### For Users
-- **Character Generator**: Now includes species selection dropdown
-- **New Feature**: Access the Name Generator via the header navigation
-- **Improved**: More accurate species-specific name generation
-- **Better**: Faster loading without external API dependencies
+- Character Generator: Now includes species selection dropdown
+- New Feature: Access the Name Generator via the header navigation
+- Improved: More accurate species-specific name generation
+- Better: Faster loading without external API dependencies
 
 ### For Developers
-- **Breaking**: `firstNames.json` and `lastNames.json` can now be safely removed
-- **New**: Species data structure in 5 separate JSON files
-- **Enhanced**: Error handling patterns for production readiness
-- **Ready**: Framework for easy species expansion
+- Breaking: `firstNames.json` and `lastNames.json` can now be safely removed
+- New: Species data structure in 5 separate JSON files
+- Enhanced: Error handling patterns for production readiness
+- Ready: Framework for easy species expansion
 
 ---
 
