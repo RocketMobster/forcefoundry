@@ -121,11 +121,8 @@ export default function Home() {
   const [availableSpecies, setAvailableSpecies] = useState([]);
   const [selectedSpecies, setSelectedSpecies] = useState("Random");
   const [statSystem, setStatSystem] = useState("traditional");
-  // AI Portrait generation is temporarily disabled
-  const [aiPortraitEnabled, setAiPortraitEnabled] = useState(false); // Always initialize to false
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [portraitError, setPortraitError] = useState(null);
   const [mode, setMode] = useState('character');
 
   useEffect(() => {
@@ -261,11 +258,6 @@ export default function Home() {
                 ? 'Classic D&D-style attributes for general RPG systems'
                 : 'SWTOR-specific stats with hitpoints calculated from endurance (x10)'}
             </p>
-          </div>
-          <div className="max-w-md mx-auto mb-6 flex items-center gap-4">
-            <label className="block text-sm font-medium text-gray-300 mb-2">AI Portrait Generation:</label>
-            <span className="text-yellow-400 font-bold">[TEMPORARILY DISABLED]</span>
-            <input type="checkbox" checked={aiPortraitEnabled} disabled className="ml-2" />
           </div>
           {/* Show original buttons only if no character is generated */}
           {!character && (

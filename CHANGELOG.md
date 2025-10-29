@@ -1,3 +1,18 @@
+# [2.5.0] - 2025-10-29
+
+### 🗑️ Major Feature Removal
+
+- **REMOVED**: AI portrait generation feature completely removed from codebase
+  - Removed all SubNP API integration code
+  - Removed portrait state management (aiPortraitEnabled, portraitError)
+  - Removed portrait generation UI elements (toggle, buttons, disabled messages)
+  - Removed portrait-related functions and API calls
+  - Decision made due to prohibitive API costs and development complexity
+  - Focus shifted to core character and name generation features
+  - Codebase simplified by removing all portrait functionality
+
+---
+
 # [2.3.2] - 2025-07-22
 # [2.4.0] - 2025-07-23
 
@@ -207,8 +222,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Roadmap
 
 ### Immediate Next Steps
-- Remove the AI image portrait functionality entirely, including the toggle and note on the character generator page.
 - Add a button to the character generator that copies a generated character in a format suitable for pasting into external AI image generators (e.g., Stable Diffusion, Midjourney) to create a portrait outside the app.
+- Add device detection for desktop vs mobile UI optimization
 
 ### Future Considerations
 - Possibly add a portrait function that pulls a random portrait JPG or PNG from a data folder for the character's class and species and displays it. This is a potential feature under consideration.

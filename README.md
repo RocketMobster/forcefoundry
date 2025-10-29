@@ -1,12 +1,14 @@
-# ⚠️ Known Issues
-
-**AI Portrait Generation - TEMPORARILY DISABLED:**
-- The AI portrait generation feature has been temporarily disabled.
-- This is due to ongoing API limitations and associated costs.
-- The feature will be reconsidered in a future update.
-- All other character and name generation features work normally.
-
 # 🌌 ForceFoundry - Star Wars Character & Name Generator
+
+## ⚠️ Note on AI Portrait Generation
+
+**AI Portrait Generation Feature - REMOVED:**
+- The AI portrait generation feature was attempted in earlier versions but has been permanently removed.
+- This feature proved too difficult and expensive to maintain (both in terms of API costs and development complexity).
+- The feature has been removed entirely from the codebase to simplify the application and focus on core name and character generation features.
+- All character and name generation features work normally without this feature.
+
+---
 
 ![Next.js](https://img.shields.io/badge/Built_with-Next.js-000?logo=next.js&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Styled_with-TailwindCSS-38bdf8?logo=tailwindcss&logoColor=white)
@@ -171,8 +173,6 @@ This project is for educational and entertainment purposes. Star Wars is a trade
 
 \- 🌌 Star Wars species and homeworld via SWAPI
 
-\- 🧬 SubnP AI image generation integration
-
 \- 📥 Download character as `.json` file
 
 \- 🧪 Class-based stat logic and icons
@@ -192,8 +192,6 @@ This project is for educational and entertainment purposes. Star Wars is a trade
 \- `data/firstNames.json` and `data/lastNames.json`: Easily editable name pools.
 
 \- `pages/index.js`: Main logic and UI.
-
-\- SubnP API is called directly — no auth required for free tier.
 
 
 

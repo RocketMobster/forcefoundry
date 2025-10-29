@@ -1,7 +1,20 @@
 # 🌌 ForceFoundry Development Roadmap
+
+## � Note on AI Portrait Generation
+
+**AI Portrait Generation - REMOVED:**
+The AI portrait generation feature was attempted in earlier versions but has been permanently removed from the project. This feature proved too difficult and expensive to maintain:
+- External API costs were prohibitive for a free tool
+- API integration complexity and reliability issues
+- Development time better spent on core features
+- Decided to focus on character and name generation instead
+
+The codebase has been simplified by removing all portrait generation code, API connections, and related UI elements.
+
+---
+
 # 🚩 Immediate Next Steps
 
-- Remove the AI image portrait functionality entirely, including the toggle and note on the character generator page.
 - Add a button to the character generator that copies a generated character in a format suitable for pasting into external AI image generators (e.g., Stable Diffusion, Midjourney) to create a portrait outside the app.
 - Add a function to detect device type on app load and adjust navigation/menu placement and other UI elements for desktop computers versus mobile devices (current design is mobile-optimized).
 
@@ -69,17 +82,10 @@
   - [x] Force-specific abilities and traits
 
 ### 🖼️ **Visual Enhancements**
-- [x] **Character Portraits**
-  - [x] Reconnect SubNP API for AI-generated portraits
-  - [x] Add fallback image system
-  - [x] Implement image caching for performance
-  - [x] Add "🖼️ Generate New Portrait" button
-  - [x] **Enhanced Portrait Features**
-    - [x] Detailed AI prompts with species, class, and alignment
-    - [x] Error handling and user feedback
-    - [x] Graceful fallback to character icons
-    - [x] Separate portrait regeneration function
-    - [x] Loading states and disabled button handling
+- [x] **Character Portraits** - *REMOVED*
+  - Feature was attempted but removed due to API costs and complexity
+  - All portrait generation code has been removed from the codebase
+  - Focus shifted to core character and name generation features
 
 ### ⚙️ **Settings & Configuration**
 - [ ] **Settings Page Development**
@@ -222,7 +228,6 @@ const lightsaberColors = {
 ### **Technical Considerations**
 - **PDF Generation**: Use `jsPDF` with custom templates
 - **File Upload**: Validate JSON structure before allowing use
-- **API Integration**: Implement retry logic and fallbacks for SubNP
 - **State Management**: Consider upgrading to useReducer for complex state
 
 ---
@@ -241,8 +246,7 @@ const lightsaberColors = {
 
 ### **Phase 3 (Week 5-6)**
 1. PDF export functionality
-2. SubNP API reconnection
-3. Advanced UI improvements
+2. Advanced UI improvements
 
 ---
 
@@ -252,7 +256,6 @@ const lightsaberColors = {
 - [ ] PDF export working for all character types
 - [ ] Settings page allows full customization
 - [ ] Mobile-responsive design completed
-- [ ] SubNP API integration stable with fallbacks
 
 ---
 
