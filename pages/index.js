@@ -14,65 +14,55 @@ import femaleFirstNames from '../data/female_first_names.json';
 import femaleLastNames from '../data/female_last_names.json';
 import otherNamesNeutral from '../data/other_names_neutral.json';
 import canonNamesData from '../data/canon_names.json';
+import swtorClasses from '../data/swtor_classes.json';
 
 // Character generation data
 const alignments = ["Light Side", "Gray", "Dark Side", "Neutral"];
 const genders = ["male", "female", "other"];
-const classes = ["Jedi", "Sith", "Bounty Hunter", "Smuggler"];
+const factions = ["Galactic Republic", "Sith Empire"];
 const homeworldTypes = ["Core World", "Mid Rim", "Outer Rim", "Unknown Regions", "Wild Space", "Hutt Space"];
 const lightsaberColors = {
-  "Jedi": ["blue", "green", "yellow", "purple"],
-  "Sith": ["red"],
-  "Gray": ["orange", "yellow", "white", "silver", "viridian"]
+  "republic_force": ["blue", "green", "yellow", "purple"],
+  "empire_force": ["red", "orange", "purple"],
+  "gray": ["orange", "yellow", "white", "silver", "viridian"]
 };
 
-// Stats for different character systems
-const statSystems = {
-  traditional: {
-    Jedi: {
-      stats: { strength: 12, agility: 14, intelligence: 13, wisdom: 15, charisma: 12, constitution: 11 },
-      forceUser: true,
-      equipment: ["Lightsaber", "Jedi Robes", "Comlink", "Meditation Crystal"]
-    },
-    Sith: {
-      stats: { strength: 14, agility: 13, intelligence: 14, wisdom: 12, charisma: 10, constitution: 14 },
-      forceUser: true,
-      equipment: ["Lightsaber", "Sith Robes", "Amulet", "Holocron"]
-    },
-    "Bounty Hunter": {
-      stats: { strength: 14, agility: 15, intelligence: 12, wisdom: 11, charisma: 10, constitution: 15 },
-      forceUser: false,
-      equipment: ["Blaster Rifle", "Armor", "Jetpack", "Tracking Fob", "Binders"]
-    },
-    Smuggler: {
-      stats: { strength: 12, agility: 14, intelligence: 13, wisdom: 10, charisma: 15, constitution: 12 },
-      forceUser: false,
-      equipment: ["Blaster Pistol", "Datapad", "Comlink", "Ship Keys", "Sabacc Cards"]
-    }
-  },
-  swtor: {
-    Jedi: {
-      stats: { strength: 10, endurance: 12, aim: 11, cunning: 14, willpower: 15 },
-      forceUser: true,
-      equipment: ["Lightsaber", "Jedi Robes", "Focus", "Shield Generator"]
-    },
-    Sith: {
-      stats: { strength: 13, endurance: 14, aim: 10, cunning: 12, willpower: 15 },
-      forceUser: true,
-      equipment: ["Lightsaber", "Sith Armor", "Force Amplifier", "Trophy Belt"]
-    },
-    "Bounty Hunter": {
-      stats: { strength: 12, endurance: 15, aim: 14, cunning: 12, willpower: 10 },
-      forceUser: false,
-      equipment: ["Heavy Cannon", "Armor Plating", "Missile System", "Targeting Computer"]
-    },
-    Smuggler: {
-      stats: { strength: 11, endurance: 12, aim: 15, cunning: 14, willpower: 11 },
-      forceUser: false,
-      equipment: ["Blaster", "Stealth Field", "Scattergun", "Med Kit"]
-    }
-  }
-};
+// Helper functions for SWTOR classes
+function getAllAdvancedClasses() {
+  return Object.keys(swtorClasses.advancedClasses);
+}
+
+function getAdvancedClassesByFaction(faction) {
+  const factionKey = faction === "Galactic Republic" ? "republic" : "empire";
+  return Object.entries(swtorClasses.advancedClasses)
+    .filter(([name, data]) => data.faction === factionKey)
+    .map(([name, data]) => name);
+}
+
+function getBaseClassesByFaction(faction) {
+  const factionKey = faction === "Galactic Republic" ? "republic" : "empire";
+  return Object.keys(swtorClasses.baseClasses[factionKey]);
+}
+
+function getAdvancedClassesForBaseClass(baseClass, faction) {
+  const factionKey = faction === "Galactic Republic" ? "republic" : "empire";
+  const baseClassData = swtorClasses.baseClasses[factionKey][baseClass];
+  return baseClassData ? baseClassData.advancedClasses : [];
+}
+
+function getSkillTreesForAdvancedClass(advancedClass) {
+  const classData = swtorClasses.advancedClasses[advancedClass];
+  return classData ? Object.keys(classData.skillTrees) : [];
+}
+
+function isForceUser(advancedClass) {
+  const classData = swtorClasses.advancedClasses[advancedClass];
+  if (!classData) return false;
+  
+  const factionKey = classData.faction === "republic" ? "republic" : "empire";
+  const baseClassData = swtorClasses.baseClasses[factionKey][classData.baseClass];
+  return baseClassData ? baseClassData.type === "force" : false;
+}
 
 // Utility function to get a random element from an array
 function getRandom(arr) {
@@ -120,7 +110,10 @@ console.log(`Canon names loaded: ${canonNamesLoaded ? 'Yes' : 'No'}, count: ${ca
 export default function Home() {
   const [availableSpecies, setAvailableSpecies] = useState([]);
   const [selectedSpecies, setSelectedSpecies] = useState("Random");
-  const [statSystem, setStatSystem] = useState("traditional");
+  const [selectedFaction, setSelectedFaction] = useState("Random");
+  const [selectedBaseClass, setSelectedBaseClass] = useState("Random");
+  const [selectedAdvancedClass, setSelectedAdvancedClass] = useState("Random");
+  const [selectedSkillTree, setSelectedSkillTree] = useState("Random");
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('character');
@@ -147,82 +140,158 @@ export default function Home() {
   // All character/stat generation logic should be in functions/hooks above this line
 
 
-  // Character generation logic
+  // Character generation logic with user selections
   const generateCharacter = () => {
     setLoading(true);
-    // Pick species
+    
+    // Pick faction based on user selection or random
+    let faction = selectedFaction === "Random" ? getRandom(factions) : selectedFaction;
+    
+    // Pick base class based on faction and user selection
+    let baseClasses = getBaseClassesByFaction(faction);
+    let baseClass = selectedBaseClass === "Random" ? getRandom(baseClasses) : 
+                    (baseClasses.includes(selectedBaseClass) ? selectedBaseClass : getRandom(baseClasses));
+    
+    // Pick advanced class based on base class and user selection
+    let advancedClasses = getAdvancedClassesForBaseClass(baseClass, faction);
+    let advancedClass = selectedAdvancedClass === "Random" ? getRandom(advancedClasses) : 
+                       (advancedClasses.includes(selectedAdvancedClass) ? selectedAdvancedClass : getRandom(advancedClasses));
+    
+    // Pick skill tree based on advanced class and user selection
+    let skillTrees = getSkillTreesForAdvancedClass(advancedClass);
+    let skillTree = selectedSkillTree === "Random" ? getRandom(skillTrees) : 
+                   (skillTrees.includes(selectedSkillTree) ? selectedSkillTree : getRandom(skillTrees));
+    
+    // Get class data
+    let classData = swtorClasses.advancedClasses[advancedClass];
+    let skillTreeData = classData.skillTrees[skillTree];
+    
+    // Generate other character attributes
     let species = selectedSpecies === "Random" ? getRandom(availableSpecies) : selectedSpecies;
-    // Pick class
-    let charClass = getRandom(classes);
-    // Pick alignment
     let alignment = getRandom(alignments);
-    // Pick gender
     let gender = getRandom(genders);
-    // Pick homeworld
     let homeworldType = getRandom(homeworldTypes);
     let homeworld = { name: homeworldType };
-    // Pick stats and equipment
-    let stats = statSystems[statSystem][charClass].stats;
-    let forceUser = statSystems[statSystem][charClass].forceUser;
-    let equipment = statSystems[statSystem][charClass].equipment;
-    // Pick lightsaber color if force user
-    let lightsaberColor = forceUser ? getRandom(lightsaberColors[charClass] || []) : null;
-    // Pick name
+    
+    // Generate stats (add some randomness to base stats)
+    let baseStats = { ...classData.stats.base };
+    Object.keys(baseStats).forEach(stat => {
+      baseStats[stat] += Math.floor(Math.random() * 3) - 1; // -1 to +1 variation
+      baseStats[stat] = Math.max(8, Math.min(18, baseStats[stat])); // Keep within 8-18 range
+    });
+    
+    // Determine if force user and lightsaber color
+    let forceUser = isForceUser(advancedClass);
+    let lightsaberColor = null;
+    if (forceUser) {
+      let colorKey = faction === "Galactic Republic" ? "republic_force" : "empire_force";
+      if (alignment === "Gray") colorKey = "gray";
+      lightsaberColor = getRandom(lightsaberColors[colorKey] || []);
+    }
+    
+    // Generate name
     let name = getNameFromSpecies(maleFirstNames, species) + " " + getNameFromSpecies(maleLastNames, species);
-    // Compose character object
+    
     const characterObj = {
       name,
       species,
-      charClass,
+      faction,
+      baseClass,
+      advancedClass,
+      skillTree,
+      role: skillTreeData.role,
       alignment,
       gender,
       homeworld,
-      stats,
+      stats: baseStats,
       forceUser,
-      equipment,
+      equipment: classData.equipment,
       lightsaberColor,
+      description: classData.description,
+      skillTreeDescription: skillTreeData.description,
       _created: Date.now()
     };
+    
     setCharacter(characterObj);
     setLoading(false);
   };
 
-  // Full random character logic
+  // Full random character logic with SWTOR system
   const generateFullRandomCharacter = () => {
     setLoading(true);
-    // Pick everything randomly
-    let species = getRandom(availableSpecies);
-    let charClass = getRandom(classes);
+    
+    // Pick faction first
+    let faction = selectedFaction === "Random" ? getRandom(factions) : selectedFaction;
+    
+    // Pick base class based on faction
+    let baseClasses = getBaseClassesByFaction(faction);
+    let baseClass = selectedBaseClass === "Random" ? getRandom(baseClasses) : selectedBaseClass;
+    
+    // Pick advanced class based on base class
+    let advancedClasses = getAdvancedClassesForBaseClass(baseClass, faction);
+    let advancedClass = selectedAdvancedClass === "Random" ? getRandom(advancedClasses) : selectedAdvancedClass;
+    
+    // Pick skill tree based on advanced class
+    let skillTrees = getSkillTreesForAdvancedClass(advancedClass);
+    let skillTree = selectedSkillTree === "Random" ? getRandom(skillTrees) : selectedSkillTree;
+    
+    // Get class data
+    let classData = swtorClasses.advancedClasses[advancedClass];
+    let skillTreeData = classData.skillTrees[skillTree];
+    
+    // Generate other character attributes
+    let species = selectedSpecies === "Random" ? getRandom(availableSpecies) : selectedSpecies;
     let alignment = getRandom(alignments);
     let gender = getRandom(genders);
     let homeworldType = getRandom(homeworldTypes);
     let homeworld = { name: homeworldType };
-    let statSystemKey = getRandom(Object.keys(statSystems));
-    let stats = statSystems[statSystemKey][charClass].stats;
-    let forceUser = statSystems[statSystemKey][charClass].forceUser;
-    let equipment = statSystems[statSystemKey][charClass].equipment;
-    let lightsaberColor = forceUser ? getRandom(lightsaberColors[charClass] || []) : null;
+    
+    // Generate stats (add some randomness to base stats)
+    let baseStats = { ...classData.stats.base };
+    Object.keys(baseStats).forEach(stat => {
+      baseStats[stat] += Math.floor(Math.random() * 3) - 1; // -1 to +1 variation
+      baseStats[stat] = Math.max(8, Math.min(18, baseStats[stat])); // Keep within 8-18 range
+    });
+    
+    // Determine if force user and lightsaber color
+    let forceUser = isForceUser(advancedClass);
+    let lightsaberColor = null;
+    if (forceUser) {
+      let colorKey = faction === "Galactic Republic" ? "republic_force" : "empire_force";
+      if (alignment === "Gray") colorKey = "gray";
+      lightsaberColor = getRandom(lightsaberColors[colorKey] || []);
+    }
+    
+    // Generate name
     let name = getNameFromSpecies(maleFirstNames, species) + " " + getNameFromSpecies(maleLastNames, species);
+    
     const characterObj = {
       name,
       species,
-      charClass,
+      faction,
+      baseClass,
+      advancedClass,
+      skillTree,
+      role: skillTreeData.role,
       alignment,
       gender,
       homeworld,
-      stats,
+      stats: baseStats,
       forceUser,
-      equipment,
+      equipment: classData.equipment,
       lightsaberColor,
+      description: classData.description,
+      skillTreeDescription: skillTreeData.description,
       _created: Date.now()
     };
+    
     setCharacter(characterObj);
     setLoading(false);
   };
 
   // Only one return statement below, containing all JSX
   return (
-    <main className="max-w-4xl mx-auto px-6 pb-16">
+    <div className="w-full">
       {mode === 'character' ? (
         <>
           <div className="text-center mb-8">
@@ -243,21 +312,105 @@ export default function Home() {
             </select>
             <p className="text-xs text-gray-500 mt-1">Select a specific species or choose "Random" for variety</p>
           </div>
-          <div className="max-w-md mx-auto mb-6">
-            <label className="block text-sm font-medium text-gray-300 mb-2">Stat System:</label>
-            <select
-              value={statSystem}
-              onChange={(e) => setStatSystem(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
-            >
-              <option value="traditional">Traditional RPG (Str, Agi, Int, Wis, Cha, Con)</option>
-              <option value="swtor">Star Wars: The Old Republic (Str, End, Aim, Cun, Will, HP)</option>
-            </select>
-            <p className="text-xs text-gray-500 mt-1">
-              {statSystem === 'traditional' 
-                ? 'Classic D&D-style attributes for general RPG systems'
-                : 'SWTOR-specific stats with hitpoints calculated from endurance (x10)'}
-            </p>
+          {/* SWTOR Class Selection */}
+          <div className="max-w-md mx-auto mb-6 space-y-4">
+            {/* Faction Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Faction:</label>
+              <select
+                value={selectedFaction}
+                onChange={(e) => {
+                  setSelectedFaction(e.target.value);
+                  setSelectedBaseClass("Random");
+                  setSelectedAdvancedClass("Random");
+                  setSelectedSkillTree("Random");
+                }}
+                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+              >
+                <option value="Random">Random Faction</option>
+                {factions.map(faction => (
+                  <option key={faction} value={faction}>{faction}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Base Class Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Base Class:</label>
+              <select
+                value={selectedBaseClass}
+                onChange={(e) => {
+                  setSelectedBaseClass(e.target.value);
+                  setSelectedAdvancedClass("Random");
+                  setSelectedSkillTree("Random");
+                }}
+                className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+              >
+                <option value="Random">Random Base Class</option>
+                {selectedFaction !== "Random" && getBaseClassesByFaction(selectedFaction).map(baseClass => (
+                  <option key={baseClass} value={baseClass}>{baseClass}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Advanced Class Selection - Only show if Base Class is not Random */}
+            {selectedFaction !== "Random" && selectedBaseClass !== "Random" ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Advanced Class:</label>
+                <select
+                  value={selectedAdvancedClass}
+                  onChange={(e) => {
+                    setSelectedAdvancedClass(e.target.value);
+                    setSelectedSkillTree("Random");
+                  }}
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="Random">Random Advanced Class</option>
+                  {getAdvancedClassesForBaseClass(selectedBaseClass, selectedFaction).map(advClass => (
+                    <option key={advClass} value={advClass}>{advClass}</option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-2">Advanced Class:</label>
+                <div className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-gray-500 text-sm">
+                  Select a specific Faction and Base Class first
+                </div>
+              </div>
+            )}
+
+            {/* Skill Tree Selection - Only show if Advanced Class is not Random */}
+            {selectedFaction !== "Random" && selectedBaseClass !== "Random" && selectedAdvancedClass !== "Random" ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">Skill Tree:</label>
+                <select
+                  value={selectedSkillTree}
+                  onChange={(e) => setSelectedSkillTree(e.target.value)}
+                  className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white focus:border-blue-500 focus:outline-none"
+                >
+                  <option value="Random">Random Skill Tree</option>
+                  {getSkillTreesForAdvancedClass(selectedAdvancedClass).map(skillTree => (
+                    <option key={skillTree} value={skillTree}>{skillTree}</option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-500 mb-2">Skill Tree:</label>
+                <div className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-gray-500 text-sm">
+                  Select a specific Advanced Class first
+                </div>
+              </div>
+            )}
+            
+            <div className="text-xs text-gray-500 mt-2 space-y-1">
+              <p>The SWTOR system uses cascading selection: Faction → Base Class → Advanced Class → Skill Tree</p>
+              <p className="text-gray-400">
+                💡 <strong>Tip:</strong> Select a specific Faction and Base Class to unlock Advanced Class options. 
+                Select a specific Advanced Class to unlock Skill Tree options.
+              </p>
+            </div>
           </div>
           {/* Show original buttons only if no character is generated */}
           {!character && (
@@ -287,74 +440,102 @@ export default function Home() {
           {character && (
             <>
               {/* Action buttons above character card */}
-              <div className="max-w-lg mx-auto mt-8 mb-2 grid grid-cols-1 gap-2 md:grid-cols-5 md:gap-3 justify-center items-center">
+              <div className="max-w-6xl mx-auto mt-8 mb-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 lg:gap-2 justify-center items-stretch">
                 <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
                   title="Same Type"
                   onClick={() => {
                     setLoading(true);
+                    
+                    // Keep same class structure, randomize other attributes
                     let species = getRandom(availableSpecies);
-                    let charClass = character.charClass;
-                    let alignment = character.alignment;
-                    let gender = character.gender;
+                    let alignment = getRandom(alignments);
+                    let gender = getRandom(genders);
                     let homeworldType = getRandom(homeworldTypes);
                     let homeworld = { name: homeworldType };
-                    let stats = statSystems[statSystem][charClass].stats;
-                    let forceUser = statSystems[statSystem][charClass].forceUser;
-                    let equipment = statSystems[statSystem][charClass].equipment;
-                    let lightsaberColor = forceUser ? getRandom(lightsaberColors[charClass] || []) : null;
+                    
+                    // Keep existing class data
+                    let classData = swtorClasses.advancedClasses[character.advancedClass];
+                    let skillTreeData = classData.skillTrees[character.skillTree];
+                    
+                    // Regenerate stats with some variation
+                    let baseStats = { ...classData.stats.base };
+                    Object.keys(baseStats).forEach(stat => {
+                      baseStats[stat] += Math.floor(Math.random() * 3) - 1;
+                      baseStats[stat] = Math.max(8, Math.min(18, baseStats[stat]));
+                    });
+                    
+                    // Handle lightsaber color
+                    let lightsaberColor = null;
+                    if (character.forceUser) {
+                      let colorKey = character.faction === "Galactic Republic" ? "republic_force" : "empire_force";
+                      if (alignment === "Gray") colorKey = "gray";
+                      lightsaberColor = getRandom(lightsaberColors[colorKey] || []);
+                    }
+                    
                     let name = getNameFromSpecies(maleFirstNames, species) + " " + getNameFromSpecies(maleLastNames, species);
+                    
                     setCharacter({
                       name,
                       species,
-                      charClass,
+                      faction: character.faction,
+                      baseClass: character.baseClass,
+                      advancedClass: character.advancedClass,
+                      skillTree: character.skillTree,
+                      role: skillTreeData.role,
                       alignment,
                       gender,
                       homeworld,
-                      stats,
-                      forceUser,
-                      equipment,
+                      stats: baseStats,
+                      forceUser: character.forceUser,
+                      equipment: classData.equipment,
                       lightsaberColor,
+                      description: classData.description,
+                      skillTreeDescription: skillTreeData.description,
                       _created: Date.now()
                     });
                     setLoading(false);
                   }}
                 >
-                  <span>🔄</span>
-                  <span>Same Type</span>
+                  <span className="text-lg mb-1">🔄</span>
+                  <span className="text-center leading-tight">Same Type</span>
                 </button>
                 <button
-                  className="bg-purple-600 hover:bg-purple-700 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  className="bg-purple-600 hover:bg-purple-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
                   title="New Character (Full Random)"
                   onClick={generateFullRandomCharacter}
                 >
-                  <span>🎲</span>
-                  <span>New Character<br/>(Full Random)</span>
+                  <span className="text-lg mb-1">🎲</span>
+                  <span className="text-center leading-tight">Full Random</span>
                 </button>
                 <button
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
                   title="Reroll Stats"
                   onClick={() => {
                     setLoading(true);
-                    // Reroll only stats for current class and stat system
-                    let stats = {...statSystems[statSystem][character.charClass].stats};
-                    // Actually randomize stats for each stat key
-                    Object.keys(stats).forEach(key => {
-                      stats[key] = Math.floor(Math.random() * 6) + 10; // Example: random value between 10-15
+                    // Reroll stats based on current advanced class
+                    let classData = swtorClasses.advancedClasses[character.advancedClass];
+                    let baseStats = { ...classData.stats.base };
+                    
+                    // Add random variation to each stat
+                    Object.keys(baseStats).forEach(stat => {
+                      baseStats[stat] += Math.floor(Math.random() * 3) - 1; // -1 to +1 variation
+                      baseStats[stat] = Math.max(8, Math.min(18, baseStats[stat])); // Keep within 8-18 range
                     });
+                    
                     setCharacter({
                       ...character,
-                      stats,
+                      stats: baseStats,
                       _created: Date.now()
                     });
                     setLoading(false);
                   }}
                 >
-                  <span>🎲</span>
-                  <span>Reroll Stats</span>
+                  <span className="text-lg mb-1">🎲</span>
+                  <span className="text-center leading-tight">Reroll Stats</span>
                 </button>
                 <button
-                  className="bg-red-500 hover:bg-red-600 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  className="bg-red-500 hover:bg-red-600 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
                   title="Reroll Name"
                   onClick={() => {
                     let name = getNameFromSpecies(maleFirstNames, character.species) + " " + getNameFromSpecies(maleLastNames, character.species);
@@ -365,11 +546,11 @@ export default function Home() {
                     });
                   }}
                 >
-                  <span>🎲</span>
-                  <span>Reroll Name</span>
+                  <span className="text-lg mb-1">🎲</span>
+                  <span className="text-center leading-tight">Reroll Name</span>
                 </button>
                 <button
-                  className="bg-green-600 hover:bg-green-700 text-white w-full px-4 py-3 rounded-xl font-semibold flex flex-row items-center justify-center text-base shadow-md transition-all duration-200"
+                  className="bg-green-600 hover:bg-green-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
                   title="Download JSON"
                   onClick={() => {
                     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(character, null, 2));
@@ -381,41 +562,273 @@ export default function Home() {
                     downloadAnchorNode.remove();
                   }}
                 >
-                  <span>💾</span>
-                  <span>Download JSON</span>
+                  <span className="text-lg mb-1">💾</span>
+                  <span className="text-center leading-tight">JSON Export</span>
+                </button>
+                <button
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  title="Copy Character Description"
+                  onClick={() => {
+                    const generateCharacterDescription = () => {
+                      let description = `=== ${character.name} ===\n\n`;
+                      
+                      // Basic Information
+                      description += `Species: ${character.species}\n`;
+                      description += `Gender: ${character.gender || 'Unknown'}\n`;
+                      description += `Faction: ${character.faction}\n`;
+                      description += `Alignment: ${character.alignment}\n\n`;
+                      
+                      // Class Information
+                      description += `=== Class Information ===\n`;
+                      description += `Base Class: ${character.baseClass}\n`;
+                      description += `Advanced Class: ${character.advancedClass}\n`;
+                      description += `Skill Tree: ${character.skillTree}\n`;
+                      description += `Role: ${character.role}\n\n`;
+                      
+                      // Force Information
+                      if (character.forceUser) {
+                        description += `=== Force Abilities ===\n`;
+                        description += `Force User: Yes\n`;
+                        if (character.lightsaberColor) {
+                          description += `Lightsaber Color: ${character.lightsaberColor}\n`;
+                        }
+                        description += `\n`;
+                      }
+                      
+                      // Stats
+                      description += `=== Attributes ===\n`;
+                      Object.entries(character.stats).forEach(([stat, value]) => {
+                        description += `${stat}: ${value}\n`;
+                      });
+                      description += `\n`;
+                      
+                      // Equipment
+                      if (character.equipment && character.equipment.length > 0) {
+                        description += `=== Equipment ===\n`;
+                        character.equipment.forEach(item => {
+                          description += `• ${item}\n`;
+                        });
+                        description += `\n`;
+                      }
+                      
+                      // Background
+                      description += `=== Background ===\n`;
+                      if (character.homeworld && character.homeworld.name) {
+                        description += `Homeworld: ${character.homeworld.name}\n`;
+                      }
+                      
+                      // Class Description
+                      if (character.description) {
+                        description += `\nClass Description: ${character.description}\n`;
+                      }
+                      
+                      // Skill Tree Description
+                      if (character.skillTreeDescription) {
+                        description += `\nSpecialization: ${character.skillTreeDescription}\n`;
+                      }
+                      
+                      description += `\n=== Generated by ForceFoundry ===\n`;
+                      description += `Created: ${new Date(character._created).toLocaleDateString()}\n`;
+                      
+                      return description;
+                    };
+
+                    const characterDesc = generateCharacterDescription();
+                    
+                    if (navigator.clipboard && window.isSecureContext) {
+                      navigator.clipboard.writeText(characterDesc).then(() => {
+                        showToast('Character description copied! 📋');
+                      }).catch(() => {
+                        fallbackCopy(characterDesc);
+                      });
+                    } else {
+                      fallbackCopy(characterDesc);
+                    }
+                    
+                    function fallbackCopy(text) {
+                      const textarea = document.createElement('textarea');
+                      textarea.value = text;
+                      textarea.style.position = 'fixed';
+                      textarea.style.left = '-9999px';
+                      document.body.appendChild(textarea);
+                      textarea.focus();
+                      textarea.select();
+                      try {
+                        document.execCommand('copy');
+                        showToast('Character description copied! 📋');
+                      } catch (err) {
+                        alert('Copy failed. Please try again.');
+                      }
+                      document.body.removeChild(textarea);
+                    }
+                    
+                    function showToast(message) {
+                      const toast = document.createElement('div');
+                      toast.textContent = message;
+                      toast.style.position = 'fixed';
+                      toast.style.bottom = '32px';
+                      toast.style.left = '50%';
+                      toast.style.transform = 'translateX(-50%)';
+                      toast.style.background = '#222';
+                      toast.style.color = '#fff';
+                      toast.style.padding = '12px 24px';
+                      toast.style.borderRadius = '8px';
+                      toast.style.zIndex = '9999';
+                      toast.style.fontSize = '14px';
+                      document.body.appendChild(toast);
+                      setTimeout(() => { toast.remove(); }, 2500);
+                    }
+                  }}
+                >
+                  <span className="text-lg mb-1">📋</span>
+                  <span className="text-center leading-tight">Description</span>
+                </button>
+                <button
+                  className="bg-pink-600 hover:bg-pink-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  title="Copy AI Prompt"
+                  onClick={() => {
+                    const generateAIPrompt = () => {
+                      let prompt = `A ${character.alignment.toLowerCase()} ${character.species.toLowerCase()}`;
+                      
+                      // Add gender if specified
+                      if (character.gender && character.gender !== 'Unknown') {
+                        prompt += ` ${character.gender.toLowerCase()}`;
+                      }
+                      
+                      // Add class information
+                      prompt += ` ${character.advancedClass} from Star Wars: The Old Republic`;
+                      
+                      // Add name
+                      prompt += `. Character name: ${character.name}`;
+                      
+                      // Add faction
+                      prompt += `. They serve the ${character.faction}`;
+                      
+                      // Add role and skill tree
+                      prompt += ` and specialize in ${character.skillTree} as a ${character.role}`;
+                      
+                      // Add physical characteristics if Force user
+                      if (character.forceUser && character.lightsaberColor) {
+                        prompt += `. As a Force user, they wield a ${character.lightsaberColor} lightsaber`;
+                      }
+                      
+                      // Add key stats
+                      const topStats = Object.entries(character.stats)
+                        .filter(([stat, value]) => stat !== 'HP')
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 2)
+                        .map(([stat, value]) => `${stat.toLowerCase()}: ${value}`);
+                      
+                      if (topStats.length > 0) {
+                        prompt += `. Notable attributes: ${topStats.join(', ')}`;
+                      }
+                      
+                      // Add homeworld
+                      if (character.homeworld && character.homeworld.name) {
+                        prompt += `. From the ${character.homeworld.name}`;
+                      }
+                      
+                      // Add style guidance for AI
+                      prompt += `. Professional fantasy art style, detailed character portrait, Star Wars universe aesthetic`;
+                      
+                      return prompt;
+                    };
+
+                    const aiPrompt = generateAIPrompt();
+                    
+                    if (navigator.clipboard && window.isSecureContext) {
+                      navigator.clipboard.writeText(aiPrompt).then(() => {
+                        showToast('AI prompt copied to clipboard! 🎨');
+                      }).catch(() => {
+                        fallbackCopy(aiPrompt);
+                      });
+                    } else {
+                      fallbackCopy(aiPrompt);
+                    }
+                    
+                    function fallbackCopy(text) {
+                      const textarea = document.createElement('textarea');
+                      textarea.value = text;
+                      textarea.style.position = 'fixed';
+                      textarea.style.left = '-9999px';
+                      document.body.appendChild(textarea);
+                      textarea.focus();
+                      textarea.select();
+                      try {
+                        document.execCommand('copy');
+                        showToast('AI prompt copied to clipboard! 🎨');
+                      } catch (err) {
+                        alert('Copy failed. Please try again.');
+                      }
+                      document.body.removeChild(textarea);
+                    }
+                    
+                    function showToast(message) {
+                      const toast = document.createElement('div');
+                      toast.textContent = message;
+                      toast.style.position = 'fixed';
+                      toast.style.bottom = '32px';
+                      toast.style.left = '50%';
+                      toast.style.transform = 'translateX(-50%)';
+                      toast.style.background = '#222';
+                      toast.style.color = '#fff';
+                      toast.style.padding = '12px 24px';
+                      toast.style.borderRadius = '8px';
+                      toast.style.zIndex = '9999';
+                      toast.style.fontSize = '14px';
+                      document.body.appendChild(toast);
+                      setTimeout(() => { toast.remove(); }, 2500);
+                    }
+                  }}
+                >
+                  <span className="text-lg mb-1">🎨</span>
+                  <span className="text-center leading-tight">Copy AI Prompt</span>
                 </button>
               </div>
               {/* Explanation text below buttons */}
               <div className="max-w-lg mx-auto mb-4 mt-2 text-sm text-blue-200">
                 <div className="flex flex-col gap-1">
-                  <span>🔄 <b>Same Type:</b> Generate another {character.gender} {character.charClass}</span>
-                  <span>🎲 <b>New Character:</b> Randomize everything (gender, class, etc.)</span>
-                  <span>🎲 <b>Reroll Name:</b> Generate a new name for this character</span>
+                  <span>🔄 <b>Same Type:</b> Generate another {character.advancedClass} ({character.skillTree})</span>
+                  <span>🎲 <b>New Character:</b> Randomize everything (faction, class, skill tree, etc.)</span>
+                  <span>🎲 <b>Reroll Stats/Name:</b> Regenerate specific character attributes</span>
+                  <span>📋 <b>Description:</b> Copy formatted character sheet for RPG sessions</span>
+                  <span>🎨 <b>AI Prompt:</b> Copy optimized prompt for AI image generators</span>
                 </div>
               </div>
               {/* Character Card Display */}
               <div className="max-w-lg mx-auto bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
-                {/* Portrait area with default class icon */}
+                {/* Portrait area with faction-based icon */}
                 <div className="flex justify-center items-center mb-4">
                   {(() => {
-                    switch (character.charClass) {
-                      case 'Jedi':
-                        return <span className="text-blue-400 text-5xl" title="Jedi">🧑‍🚀</span>;
-                      case 'Sith':
-                        return <span className="text-red-500 text-5xl" title="Sith">🦹‍♂️</span>;
-                      case 'Bounty Hunter':
-                        return <span className="text-green-400 text-5xl" title="Bounty Hunter">🤠</span>;
-                      case 'Smuggler':
-                        return <span className="text-yellow-400 text-5xl" title="Smuggler">🕵️‍♂️</span>;
-                      default:
-                        return <span className="text-gray-400 text-5xl" title="Character">🧑‍🎤</span>;
+                    if (character.forceUser) {
+                      return character.faction === "Galactic Republic" ? 
+                        <span className="text-blue-400 text-5xl" title="Republic Force User">🧑‍🚀</span> :
+                        <span className="text-red-500 text-5xl" title="Empire Force User">🦹‍♂️</span>;
+                    } else {
+                      return character.faction === "Galactic Republic" ?
+                        <span className="text-green-400 text-5xl" title="Republic Tech User">�️</span> :
+                        <span className="text-orange-400 text-5xl" title="Empire Tech User">💀</span>;
                     }
                   })()}
                 </div>
-                {/* Gender display */}
+                {/* Character Name and Basic Info */}
                 <h3 className="text-xl font-bold mb-2 text-yellow-300">{character.name}</h3>
-                {/* ...existing code... */}
-                <div className="mb-2 text-gray-300">{character.species} &mdash; {character.charClass}</div>
+                <div className="mb-2 text-gray-300">{character.species} &mdash; {character.faction}</div>
+                
+                {/* Class Information */}
+                <div className="mb-3 p-3 bg-gray-700 rounded-lg">
+                  <div className="mb-1 text-gray-400">Base Class: <span className="font-semibold text-blue-400">{character.baseClass}</span></div>
+                  <div className="mb-1 text-gray-400">Advanced Class: <span className="font-semibold text-purple-400">{character.advancedClass}</span></div>
+                  <div className="mb-1 text-gray-400">Skill Tree: <span className="font-semibold text-green-400">{character.skillTree}</span> <span className="text-xs text-gray-500">({character.role})</span></div>
+                  {character.description && (
+                    <div className="text-xs text-gray-400 italic mt-2">{character.description}</div>
+                  )}
+                  {character.skillTreeDescription && (
+                    <div className="text-xs text-gray-300 mt-1">{character.skillTreeDescription}</div>
+                  )}
+                </div>
+                
+                {/* Character Attributes */}
                 <div className="mb-2 text-gray-400">Gender: <span className={
                   character.gender === 'male' ? 'font-semibold text-blue-400' :
                   character.gender === 'female' ? 'font-semibold text-pink-400' :
@@ -433,8 +846,8 @@ export default function Home() {
                   {character.stats && Object.entries(character.stats).map(([stat, value]) => (
                     <li key={stat} className="flex justify-between"><span className="font-semibold text-gray-400">{stat}</span> <span>{value}</span></li>
                   ))}
-                  {/* Show HP for SWTOR stats */}
-                  {statSystem === 'swtor' && character.stats.endurance && (
+                  {/* Show HP calculated from endurance */}
+                  {character.stats.endurance && (
                     <li className="flex justify-between"><span className="font-semibold text-gray-400">HP</span> <span>{character.stats.endurance * 10}</span></li>
                   )}
                 </ul>
@@ -446,6 +859,6 @@ export default function Home() {
       ) : (
         <NameGenerator />
       )}
-    </main>
+    </div>
   );
 }

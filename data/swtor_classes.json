@@ -1,0 +1,470 @@
+{
+  "factions": {
+    "republic": "Galactic Republic",
+    "empire": "Sith Empire"
+  },
+  "baseClasses": {
+    "republic": {
+      "Jedi Knight": {
+        "description": "Guardians of peace and justice in the galaxy",
+        "type": "force",
+        "advancedClasses": ["Jedi Guardian", "Jedi Sentinel"]
+      },
+      "Jedi Consular": {
+        "description": "Wielders of ancient Force knowledge and wisdom",
+        "type": "force", 
+        "advancedClasses": ["Jedi Sage", "Jedi Shadow"]
+      },
+      "Trooper": {
+        "description": "Elite soldiers of the Republic military",
+        "type": "tech",
+        "advancedClasses": ["Commando", "Vanguard"]
+      },
+      "Smuggler": {
+        "description": "Rogues, pirates, and independent operators",
+        "type": "tech",
+        "advancedClasses": ["Gunslinger", "Scoundrel"]
+      }
+    },
+    "empire": {
+      "Sith Warrior": {
+        "description": "Masters of the dark side's raw power",
+        "type": "force",
+        "advancedClasses": ["Sith Juggernaut", "Sith Marauder"]
+      },
+      "Sith Inquisitor": {
+        "description": "Seekers of ancient Sith secrets and power",
+        "type": "force",
+        "advancedClasses": ["Sith Sorcerer", "Sith Assassin"]
+      },
+      "Bounty Hunter": {
+        "description": "Mercenaries and hunters for hire",
+        "type": "tech",
+        "advancedClasses": ["Mercenary", "Powertech"]
+      },
+      "Imperial Agent": {
+        "description": "Spies and operatives of Imperial Intelligence",
+        "type": "tech",
+        "advancedClasses": ["Operative", "Sniper"]
+      }
+    }
+  },
+  "advancedClasses": {
+    "Jedi Guardian": {
+      "baseClass": "Jedi Knight",
+      "faction": "republic",
+      "role": "Tank/DPS",
+      "description": "Heavy armor-wearing tank focused on lightsaber combat",
+      "skillTrees": {
+        "Defense": {
+          "role": "Tank",
+          "description": "Guardian tank specialization with heavy armor and protective abilities"
+        },
+        "Vigilance": {
+          "role": "DPS", 
+          "description": "Focused burst damage dealing with lightsaber techniques"
+        },
+        "Focus": {
+          "role": "DPS",
+          "description": "Kinetic energy manipulation and AoE damage"
+        }
+      },
+      "stats": {
+        "primary": "Strength",
+        "secondary": ["Endurance", "Accuracy", "Critical Rating"],
+        "base": { "strength": 15, "endurance": 14, "aim": 8, "cunning": 10, "willpower": 12 }
+      },
+      "equipment": ["Lightsaber", "Heavy Armor", "Shield Generator", "Force Focus"]
+    },
+    "Jedi Sentinel": {
+      "baseClass": "Jedi Knight", 
+      "faction": "republic",
+      "role": "DPS",
+      "description": "Dual-wielding damage dealer with combat prowess",
+      "skillTrees": {
+        "Watchman": {
+          "role": "DPS",
+          "description": "DoT-based damage over time specialization"
+        },
+        "Combat": {
+          "role": "DPS",
+          "description": "Melee burst damage and lightsaber mastery"
+        },
+        "Concentration": {
+          "role": "DPS", 
+          "description": "Single-target focus and sustained damage"
+        }
+      },
+      "stats": {
+        "primary": "Strength",
+        "secondary": ["Critical Rating", "Surge", "Accuracy"],
+        "base": { "strength": 16, "endurance": 12, "aim": 9, "cunning": 11, "willpower": 11 }
+      },
+      "equipment": ["Dual Lightsabers", "Medium Armor", "Combat Stims", "Force Focus"]
+    },
+    "Jedi Sage": {
+      "baseClass": "Jedi Consular",
+      "faction": "republic", 
+      "role": "DPS/Healer",
+      "description": "Force-wielding caster with healing and damage abilities",
+      "skillTrees": {
+        "Seer": {
+          "role": "Healer",
+          "description": "Primary healing specialization with Force powers"
+        },
+        "Telekinetics": {
+          "role": "DPS",
+          "description": "Ranged Force damage and kinetic attacks"
+        },
+        "Balance": {
+          "role": "DPS",
+          "description": "DoT damage and Force equilibrium abilities"
+        }
+      },
+      "stats": {
+        "primary": "Willpower",
+        "secondary": ["Endurance", "Critical Rating", "Surge"],
+        "base": { "strength": 8, "endurance": 12, "aim": 8, "cunning": 11, "willpower": 16 }
+      },
+      "equipment": ["Lightsaber", "Light Armor", "Force Focus", "Meditation Crystal"]
+    },
+    "Jedi Shadow": {
+      "baseClass": "Jedi Consular",
+      "faction": "republic",
+      "role": "Tank/DPS",
+      "description": "Stealthy Force-user with defensive capabilities",
+      "skillTrees": {
+        "Kinetic Combat": {
+          "role": "Tank", 
+          "description": "Kinetic shielding and defensive Force powers"
+        },
+        "Infiltration": {
+          "role": "DPS",
+          "description": "Stealth attacks and burst damage"
+        },
+        "Serenity": {
+          "role": "DPS",
+          "description": "Force DoT damage and mental attacks"
+        }
+      },
+      "stats": {
+        "primary": "Willpower",
+        "secondary": ["Endurance", "Critical Rating", "Accuracy"], 
+        "base": { "strength": 10, "endurance": 13, "aim": 9, "cunning": 12, "willpower": 15 }
+      },
+      "equipment": ["Double-bladed Lightsaber", "Medium Armor", "Stealth Field", "Force Focus"]
+    },
+    "Commando": {
+      "baseClass": "Trooper",
+      "faction": "republic",
+      "role": "DPS/Healer", 
+      "description": "Heavy weapons specialist with medical training",
+      "skillTrees": {
+        "Combat Medic": {
+          "role": "Healer",
+          "description": "Advanced medical protocols and healing technology"
+        },
+        "Gunnery": {
+          "role": "DPS",
+          "description": "Heavy cannon and artillery specialization"
+        },
+        "Assault Specialist": {
+          "role": "DPS",
+          "description": "Advanced explosive and assault tactics"
+        }
+      },
+      "stats": {
+        "primary": "Aim",
+        "secondary": ["Endurance", "Critical Rating", "Surge"],
+        "base": { "strength": 11, "endurance": 13, "aim": 15, "cunning": 10, "willpower": 10 }
+      },
+      "equipment": ["Assault Cannon", "Heavy Armor", "Medical Scanner", "Combat Stims"]
+    },
+    "Vanguard": {
+      "baseClass": "Trooper",
+      "faction": "republic",
+      "role": "Tank/DPS",
+      "description": "Close-combat specialist with heavy armor",
+      "skillTrees": {
+        "Shield Specialist": {
+          "role": "Tank",
+          "description": "Energy shield technology and defensive tactics"
+        },
+        "Tactics": {
+          "role": "DPS", 
+          "description": "Close-quarters combat and assault techniques"
+        },
+        "Plasmatech": {
+          "role": "DPS",
+          "description": "Plasma weapon technology and thermal damage"
+        }
+      },
+      "stats": {
+        "primary": "Aim",
+        "secondary": ["Endurance", "Accuracy", "Critical Rating"],
+        "base": { "strength": 12, "endurance": 15, "aim": 14, "cunning": 9, "willpower": 9 }
+      },
+      "equipment": ["Blaster Rifle", "Heavy Armor", "Energy Shield", "Riot Gas"]
+    },
+    "Gunslinger": {
+      "baseClass": "Smuggler",
+      "faction": "republic",
+      "role": "DPS",
+      "description": "Dual-wielding pistol expert with cover tactics",
+      "skillTrees": {
+        "Sharpshooter": {
+          "role": "DPS",
+          "description": "Precision shooting and long-range combat"
+        },
+        "Saboteur": {
+          "role": "DPS", 
+          "description": "Explosives and area denial tactics"
+        },
+        "Dirty Fighting": {
+          "role": "DPS",
+          "description": "DoT attacks and underhanded combat techniques"
+        }
+      },
+      "stats": {
+        "primary": "Cunning",
+        "secondary": ["Critical Rating", "Surge", "Accuracy"],
+        "base": { "strength": 9, "endurance": 11, "aim": 12, "cunning": 16, "willpower": 11 }
+      },
+      "equipment": ["Dual Blaster Pistols", "Medium Armor", "Portable Cover", "Flash Grenades"]
+    },
+    "Scoundrel": {
+      "baseClass": "Smuggler",
+      "faction": "republic",
+      "role": "DPS/Healer",
+      "description": "Stealth operative with medical and combat skills",
+      "skillTrees": {
+        "Sawbones": {
+          "role": "Healer",
+          "description": "Field medicine and emergency treatment protocols"
+        },
+        "Scrapper": {
+          "role": "DPS",
+          "description": "Close-quarters stealth attacks and burst damage"
+        },
+        "Ruffian": {
+          "role": "DPS",
+          "description": "DoT damage and poison-based attacks"
+        }
+      },
+      "stats": {
+        "primary": "Cunning",
+        "secondary": ["Endurance", "Critical Rating", "Accuracy"],
+        "base": { "strength": 10, "endurance": 12, "aim": 11, "cunning": 15, "willpower": 11 }
+      },
+      "equipment": ["Scattergun", "Light Armor", "Stealth Generator", "Med Pack"]
+    },
+    "Sith Juggernaut": {
+      "baseClass": "Sith Warrior",
+      "faction": "empire",
+      "role": "Tank/DPS",
+      "description": "Heavily armored Sith warrior with defensive capabilities",
+      "skillTrees": {
+        "Immortal": {
+          "role": "Tank",
+          "description": "Dark side defensive powers and heavy armor mastery"
+        },
+        "Vengeance": {
+          "role": "DPS",
+          "description": "Retaliatory damage and sustained combat abilities"
+        },
+        "Rage": {
+          "role": "DPS",
+          "description": "Fury-driven burst damage and AoE attacks"
+        }
+      },
+      "stats": {
+        "primary": "Strength", 
+        "secondary": ["Endurance", "Accuracy", "Critical Rating"],
+        "base": { "strength": 15, "endurance": 14, "aim": 8, "cunning": 10, "willpower": 12 }
+      },
+      "equipment": ["Lightsaber", "Heavy Armor", "Sith Focus", "Dark Side Relic"]
+    },
+    "Sith Marauder": {
+      "baseClass": "Sith Warrior",
+      "faction": "empire", 
+      "role": "DPS",
+      "description": "Dual-wielding Sith focused on raw damage output",
+      "skillTrees": {
+        "Annihilation": {
+          "role": "DPS",
+          "description": "DoT-based damage and bleeding attacks"
+        },
+        "Carnage": {
+          "role": "DPS",
+          "description": "Burst damage and lightsaber technique mastery"
+        },
+        "Fury": {
+          "role": "DPS",
+          "description": "Rage-fueled sustained damage and berserker abilities"
+        }
+      },
+      "stats": {
+        "primary": "Strength",
+        "secondary": ["Critical Rating", "Surge", "Accuracy"],
+        "base": { "strength": 16, "endurance": 12, "aim": 9, "cunning": 11, "willpower": 11 }
+      },
+      "equipment": ["Dual Lightsabers", "Medium Armor", "Rage Stims", "Sith Focus"]
+    },
+    "Sith Sorcerer": {
+      "baseClass": "Sith Inquisitor",
+      "faction": "empire",
+      "role": "DPS/Healer",
+      "description": "Force lightning master with healing capabilities",
+      "skillTrees": {
+        "Corruption": {
+          "role": "Healer",
+          "description": "Dark healing and life transfer abilities"
+        },
+        "Lightning": {
+          "role": "DPS", 
+          "description": "Force lightning and electrical damage mastery"
+        },
+        "Madness": {
+          "role": "DPS",
+          "description": "DoT damage and mental manipulation attacks"
+        }
+      },
+      "stats": {
+        "primary": "Willpower",
+        "secondary": ["Endurance", "Critical Rating", "Surge"], 
+        "base": { "strength": 8, "endurance": 12, "aim": 8, "cunning": 11, "willpower": 16 }
+      },
+      "equipment": ["Lightsaber", "Light Armor", "Sith Focus", "Force Lightning Rod"]
+    },
+    "Sith Assassin": {
+      "baseClass": "Sith Inquisitor",
+      "faction": "empire",
+      "role": "Tank/DPS", 
+      "description": "Stealthy Sith with defensive Force powers",
+      "skillTrees": {
+        "Darkness": {
+          "role": "Tank",
+          "description": "Dark side shielding and defensive powers"
+        },
+        "Deception": {
+          "role": "DPS",
+          "description": "Stealth attacks and burst damage from shadows"
+        },
+        "Hatred": {
+          "role": "DPS",
+          "description": "DoT damage and hatred-fueled attacks"
+        }
+      },
+      "stats": {
+        "primary": "Willpower", 
+        "secondary": ["Endurance", "Critical Rating", "Accuracy"],
+        "base": { "strength": 10, "endurance": 13, "aim": 9, "cunning": 12, "willpower": 15 }
+      },
+      "equipment": ["Double-bladed Lightsaber", "Medium Armor", "Stealth Field", "Sith Focus"]
+    },
+    "Mercenary": {
+      "baseClass": "Bounty Hunter",
+      "faction": "empire",
+      "role": "DPS/Healer",
+      "description": "Heavy weapons mercenary with medical training",
+      "skillTrees": {
+        "Bodyguard": {
+          "role": "Healer",
+          "description": "Combat medic protocols and healing technology"
+        },
+        "Arsenal": {
+          "role": "DPS",
+          "description": "Heavy weapons mastery and artillery strikes"
+        },
+        "Innovative Ordnance": {
+          "role": "DPS", 
+          "description": "Missile systems and explosive specialization"
+        }
+      },
+      "stats": {
+        "primary": "Aim",
+        "secondary": ["Endurance", "Critical Rating", "Surge"],
+        "base": { "strength": 11, "endurance": 13, "aim": 15, "cunning": 10, "willpower": 10 }
+      },
+      "equipment": ["Heavy Blasters", "Heavy Armor", "Medical Scanner", "Missile Launcher"]
+    },
+    "Powertech": {
+      "baseClass": "Bounty Hunter", 
+      "faction": "empire",
+      "role": "Tank/DPS",
+      "description": "Close-combat tech specialist with defensive systems",
+      "skillTrees": {
+        "Shield Tech": {
+          "role": "Tank",
+          "description": "Energy shielding and defensive technology"
+        },
+        "Advanced Prototype": {
+          "role": "DPS",
+          "description": "Close-quarters combat and energy weapons"
+        },
+        "Pyrotech": {
+          "role": "DPS",
+          "description": "Flamethrower and thermal damage specialization"
+        }
+      },
+      "stats": {
+        "primary": "Aim", 
+        "secondary": ["Endurance", "Accuracy", "Critical Rating"],
+        "base": { "strength": 12, "endurance": 15, "aim": 14, "cunning": 9, "willpower": 9 }
+      },
+      "equipment": ["Blaster Pistol", "Heavy Armor", "Energy Shield", "Flamethrower"]
+    },
+    "Operative": {
+      "baseClass": "Imperial Agent",
+      "faction": "empire",
+      "role": "DPS/Healer", 
+      "description": "Stealth specialist with medical and infiltration skills",
+      "skillTrees": {
+        "Medicine": {
+          "role": "Healer", 
+          "description": "Advanced medical training and healing probes"
+        },
+        "Concealment": {
+          "role": "DPS",
+          "description": "Stealth attacks and burst damage from hiding"
+        },
+        "Lethality": {
+          "role": "DPS",
+          "description": "Poison and DoT-based damage over time"
+        }
+      },
+      "stats": {
+        "primary": "Cunning",
+        "secondary": ["Endurance", "Critical Rating", "Accuracy"],
+        "base": { "strength": 10, "endurance": 12, "aim": 11, "cunning": 15, "willpower": 11 }
+      },
+      "equipment": ["Vibroknife", "Light Armor", "Stealth Generator", "Medical Probe"]
+    },
+    "Sniper": {
+      "baseClass": "Imperial Agent",
+      "faction": "empire", 
+      "role": "DPS",
+      "description": "Long-range specialist with cover-based tactics",
+      "skillTrees": {
+        "Marksmanship": {
+          "role": "DPS",
+          "description": "Precision shooting and long-range damage"
+        },
+        "Engineering": {
+          "role": "DPS",
+          "description": "Probe droids and area denial technology"
+        },
+        "Virulence": {
+          "role": "DPS",
+          "description": "Poison shots and DoT damage specialization"
+        }
+      },
+      "stats": {
+        "primary": "Cunning",
+        "secondary": ["Critical Rating", "Surge", "Accuracy"], 
+        "base": { "strength": 9, "endurance": 11, "aim": 12, "cunning": 16, "willpower": 11 }
+      },
+      "equipment": ["Sniper Rifle", "Medium Armor", "Portable Cover", "Probe Droid"]
+    }
+  }
+}

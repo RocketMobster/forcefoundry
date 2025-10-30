@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Prevent scrollbar flash during navigation */
+html {
+  overflow-x: hidden !important;
+  overflow-y: scroll; /* Force vertical scrollbar to always be present */
+  width: 100%;
+  max-width: 100vw;
+  scrollbar-gutter: stable; /* Reserve space for scrollbar */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden !important;
+  width: 100% !important;
+  max-width: 100vw !important;
+  min-height: 100vh; /* Ensure minimum height */
+}
+
+/* Force all containers to respect width limits */
+* {
+  box-sizing: border-box;
+}
+
+/* Ensure no element can cause horizontal overflow */
+*:not(html):not(body) {
+  max-width: 100%;
+}

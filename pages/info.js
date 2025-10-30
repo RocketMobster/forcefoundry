@@ -14,7 +14,7 @@ export default function Info() {
             <div className="space-y-3">
               <div>
                 <span className="text-gray-400">Version:</span>
-                <span className="ml-2 text-white font-mono bg-gray-700 px-2 py-1 rounded">v2.5.0</span>
+                <span className="ml-2 text-white font-mono bg-gray-700 px-2 py-1 rounded">v3.0.0</span>
               </div>
               <div>
                 <span className="text-gray-400">Developer:</span>
@@ -41,27 +41,35 @@ export default function Info() {
             <ul className="space-y-2 text-gray-300">
               <li className="flex items-start">
                 <span className="text-blue-400 mr-2">•</span>
-                <span>Species-specific name generation</span>
+                <span>Complete SWTOR class system (8 base classes, 16 advanced classes, 48 skill trees)</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-400 mr-2">•</span>
-                <span>Dual stat systems (Traditional RPG & SWTOR)</span>
+                <span>Species-specific name generation with canon detection</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-400 mr-2">•</span>
-                <span>Force system integration</span>
+                <span>⭐ Favorites collection with export (TXT/JSON)</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-400 mr-2">•</span>
-                <span>Lightsaber color generation</span>
+                <span>Faction-based character creation (Republic vs Empire)</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-400 mr-2">•</span>
-                <span>Character export (JSON)</span>
+                <span>Force system integration with lightsaber colors</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-400 mr-2">•</span>
-                <span>Responsive design</span>
+                <span>Cross-species name mixing and crazy combinations</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-2">•</span>
+                <span>Character export and clipboard integration</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-blue-400 mr-2">•</span>
+                <span>Responsive design for desktop and mobile</span>
               </li>
             </ul>
           </div>
@@ -105,12 +113,12 @@ export default function Info() {
               <div className="text-sm text-gray-400">Species Supported</div>
             </div>
             <div className="bg-gray-700 rounded-lg p-4">
-              <div className="text-2xl font-bold text-green-400">10</div>
-              <div className="text-sm text-gray-400">Lightsaber Colors</div>
+              <div className="text-2xl font-bold text-green-400">48</div>
+              <div className="text-sm text-gray-400">SWTOR Skill Trees</div>
             </div>
             <div className="bg-gray-700 rounded-lg p-4">
-              <div className="text-2xl font-bold text-purple-400">4</div>
-              <div className="text-sm text-gray-400">Character Classes</div>
+              <div className="text-2xl font-bold text-purple-400">16</div>
+              <div className="text-sm text-gray-400">Advanced Classes</div>
             </div>
             <div className="bg-gray-700 rounded-lg p-4">
               <div className="text-2xl font-bold text-yellow-400">∞</div>

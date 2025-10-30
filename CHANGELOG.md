@@ -1,3 +1,82 @@
+# [3.1.0] - 2025-10-30
+
+### 🖼️ CHARACTER EXPORT & FAVORITES SYSTEM
+
+- **ADDED**: Character Export Features
+  - AI Prompt export button: Copy optimized prompts for AI image generators (Stable Diffusion, Midjourney, etc.)
+  - Character Description export: Copy formatted character sheets for RPG sessions
+  - Comprehensive character formatting with stats, class hierarchy, equipment, and background
+  - Clipboard API integration with fallback support for older browsers
+  
+- **ADDED**: Favorites Collection System
+  - Star button interface to add/remove favorite character names
+  - localStorage persistence for favorites across browser sessions
+  - Favorites modal with complete name management
+  - Export favorites as TXT or JSON formats
+  - Remove individual favorites functionality
+  - Toast notification system for user feedback
+  
+- **FIXED**: UI Layout and Responsive Design
+  - Fixed button text overflow in 7-button action grid
+  - Implemented responsive grid breakpoints (2/3/4/7 columns based on screen size)
+  - Reduced button text size and shortened labels for better fit
+  - Updated container width from max-w-lg to max-w-6xl for better button spacing
+  - Enhanced button layout with proper text wrapping and spacing
+  
+- **ENHANCED**: Name Generator Improvements
+  - Fixed species pill text overflow with proper CSS break-words
+  - Prevented duplicate hyphenated names (e.g., "Skywalker-Skywalker")
+  - Added missing famous family names (* Antilles, * Tarkin, * Fett, * Erso, * Palpatine, etc.)
+  - Replaced incorrect Wookiee female names with authentic ones (Mallatobuck, Ralrracheen, etc.)
+  - Added 23+ new Human/Common names across all gender categories
+  
+- **UPDATED**: Info Page
+  - Updated features section to include new export capabilities and favorites system
+  - Changed fun stats from "4 Character Classes" to "48 SWTOR Skill Trees"
+  - Updated advanced class count to reflect accurate "16 Advanced Classes"
+
+---
+
+# [3.0.0] - 2025-01-XX
+
+### 🎮 MAJOR SWTOR CLASS SYSTEM IMPLEMENTATION
+
+- **ADDED**: Complete Star Wars: The Old Republic (SWTOR) class system
+  - 8 Base Classes: Jedi Knight, Jedi Consular, Trooper, Smuggler (Republic) | Sith Warrior, Sith Inquisitor, Bounty Hunter, Imperial Agent (Empire)
+  - 16 Advanced Classes: Each base class has 2 advanced specializations
+  - 48 Skill Trees: 3 unique skill trees per advanced class
+  - Faction system: Galactic Republic vs Sith Empire with proper restrictions
+  
+- **ENHANCED**: Character Generation System
+  - Hierarchical class selection with cascading dropdowns (Faction → Base Class → Advanced Class → Skill Tree)
+  - SWTOR stat system: Strength, Endurance, Aim, Cunning, Willpower
+  - HP calculation based on Endurance stat
+  - Role assignment: Tank, DPS, or Healer based on skill tree
+  - Force user detection with automatic lightsaber color assignment
+  - Class-specific equipment lists tailored to each advanced class
+  
+- **IMPROVED**: User Interface
+  - Removed accordion-style navigation menu
+  - Integrated action buttons directly into header navigation
+  - Enhanced character display showing full class hierarchy
+  - Added class descriptions and role information
+  - Fixed button layout issues on mobile devices
+  - Improved responsive design across all screen sizes
+  
+- **REFACTORED**: Data Architecture
+  - New `data/swtor_classes.json` with comprehensive class definitions
+  - Updated character object structure with faction, baseClass, advancedClass, skillTree fields
+  - Implemented helper functions for class validation and lookup
+  - Maintained backward compatibility with existing species/name generation
+
+- **TECHNICAL**: Breaking Changes
+  - Replaced simple 4-class system with SWTOR hierarchy
+  - Changed stat system from generic RPG to SWTOR-specific
+  - Updated character generation logic for faction-based restrictions
+  - Modified UI components for hierarchical class selection
+
+---
+
 # [2.5.0] - 2025-10-29
 
 ### 🗑️ Major Feature Removal

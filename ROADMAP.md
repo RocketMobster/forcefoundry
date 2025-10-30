@@ -13,16 +13,43 @@ The codebase has been simplified by removing all portrait generation code, API c
 
 ---
 
-# 🚩 Immediate Next Steps
+# 🚩 Immediate Next Steps (v3.1.0)
 
-- Add a button to the character generator that copies a generated character in a format suitable for pasting into external AI image generators (e.g., Stable Diffusion, Midjourney) to create a portrait outside the app.
-- Add a function to detect device type on app load and adjust navigation/menu placement and other UI elements for desktop computers versus mobile devices (current design is mobile-optimized).
+### 🎮 SWTOR System Enhancements
+- Add companion system with class-appropriate companions from SWTOR
+- Implement legacy family surnames for related characters
+- Add crew skills and crafting professions
+- Expand equipment lists with SWTOR-specific gear sets and armor types
+- Add planetary allegiance based on faction and species
 
-# 🔮 Future Considerations
+### 🖼️ Character Export Features
+- [x] Add button to copy character description formatted for AI image generators (Stable Diffusion, Midjourney) *(Completed v3.1.0)*
+- [x] Copy formatted character sheet for RPG sessions *(Completed v3.1.0)*
+- [x] Favorites Collection System with localStorage persistence and export functionality *(Completed v3.1.0)*
+- [ ] Export character sheet as PDF or formatted text
+- [ ] Share character via URL or social media
 
-- Possibly add a portrait function that pulls a random portrait JPG or PNG from a data folder for the character's class and species and displays it. This is a potential feature under consideration.
+### 📱 Device Optimization
+- Detect device type on app load
+- Adjust UI elements for desktop vs mobile devices
+- Optimize navigation placement and button sizes
+- Enhanced responsive design for tablets
 
-## 📋 Short-Term Goals (v2.1.0)
+# 🔮 Future Considerations (v3.2.0+)
+
+### 🎨 Visual Enhancements
+- Portrait library: Random portraits from data folder based on class and species
+- Character appearance customization (height, build, scars, tattoos)
+- Lightsaber hilt customization for Force users
+- Species-specific appearance traits
+
+### 🗺️ SWTOR Lore Integration
+- Storyline choices and class quest references
+- Legacy system with family connections
+- Timeline selector (Old Republic era, Legacy era, etc.)
+- Faction reputation and achievements
+
+## 📋 Short-Term Goals (v3.2.0)
 
 ### 🗃️ **Data Management & Flexibility**
 - [x] **Remove Hardcoded Data**
@@ -62,24 +89,27 @@ The codebase has been simplified by removing all portrait generation code, API c
   - [x] Maintain species-specific naming logic
   - [x] Add smooth transition animation
 
-- [x] **Expanded Stats System**
-  - [x] Add more character attributes (Wisdom, Charisma, Constitution)
-  - [x] Implement stat ranges and modifiers
-  - [x] Consider skill specializations per class
-  - [x] **SWTOR Stat System Integration**
-    - [x] Toggle between Traditional RPG and SWTOR stat systems
-    - [x] SWTOR stats: Strength, Endurance, Aim, Cunning, Willpower, Hitpoints
-    - [x] Automatic hitpoints calculation (Endurance × 10)
-    - [x] Dynamic stat system labeling and display
+- [x] **SWTOR Class System** *(Completed v3.0.0)*
+  - [x] 8 Base Classes with faction restrictions
+  - [x] 16 Advanced Classes with specializations
+  - [x] 48 Skill Trees with unique abilities
+  - [x] Hierarchical class selection interface
+  - [x] Faction system: Galactic Republic vs Sith Empire
+  - [x] Role assignments: Tank, DPS, Healer
+  - [x] Class-specific equipment lists
 
-- [x] **Force System Integration**
-  - [x] Add Force sensitivity levels:
-    - [x] Non-Force User
-    - [x] Force Sensitive
-    - [x] Force User (Jedi/Sith)
-    - [x] Gray Jedi
+- [x] **SWTOR Stats System** *(Completed v3.0.0)*
+  - [x] Replaced generic RPG stats with SWTOR system
+  - [x] SWTOR stats: Strength, Endurance, Aim, Cunning, Willpower
+  - [x] Automatic HP calculation based on Endurance
+  - [x] Stat distribution based on class and role
+  - [x] Enhanced character display with class hierarchy
+
+- [x] **Force System Integration** *(Enhanced v3.0.0)*
+  - [x] Automatic Force user detection for Jedi/Sith classes
   - [x] Lightsaber color generation for Force users
-  - [x] Force-specific abilities and traits
+  - [x] Faction-based lightsaber colors (blue/green for Jedi, red for Sith)
+  - [x] Force-specific class descriptions and abilities
 
 ### 🖼️ **Visual Enhancements**
 - [x] **Character Portraits** - *REMOVED*
@@ -148,7 +178,7 @@ The codebase has been simplified by removing all portrait generation code, API c
 
 ---
 
-## 🚀 Medium-Term Goals (v2.3.0)
+## 🚀 Medium-Term Goals (v3.3.0)
 
 ### 🌟 **Advanced Features**
 - [ ] **Character Backstory Generator**
@@ -174,7 +204,7 @@ The codebase has been simplified by removing all portrait generation code, API c
 
 ---
 
-## 🌈 Long-Term Vision (v3.0.0)
+## 🌈 Long-Term Vision (v4.0.0)
 
 ### 📱 **Platform Expansion**
 - [ ] **Mobile App**

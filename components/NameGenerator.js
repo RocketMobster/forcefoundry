@@ -14,6 +14,29 @@ export default function NameGenerator() {
   const [randomInfoBoxVisible, setRandomInfoBoxVisible] = useState(false);
   const [usedCanonNames, setUsedCanonNames] = useState([]);
   const [canonGenderMap, setCanonGenderMap] = useState({});
+  const [favorites, setFavorites] = useState([]);
+  const [showFavorites, setShowFavorites] = useState(false);
+  
+  // Load favorites from localStorage on component mount
+  useEffect(() => {
+    try {
+      const storedFavorites = localStorage.getItem('starwars_favorites');
+      if (storedFavorites) {
+        setFavorites(JSON.parse(storedFavorites));
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  }, []);
+  
+  // Save favorites to localStorage whenever favorites change
+  useEffect(() => {
+    try {
+      localStorage.setItem('starwars_favorites', JSON.stringify(favorites));
+    } catch (error) {
+      console.error('Error saving favorites:', error);
+    }
+  }, [favorites]);
   
   // Load canon gender mapping
   useEffect(() => {
@@ -146,6 +169,92 @@ export default function NameGenerator() {
     const fallbackName = gender === 'male' ? "John" : "Jane";
     console.error(`No names found for ${gender}, using fallback: ${fallbackName}`);
     return fallbackName;
+  };
+
+  // Favorites management functions
+  const addToFavorites = (name) => {
+    const favoriteItem = {
+      id: `${name.name}_${Date.now()}`, // Unique ID to allow duplicate names from different generations
+      name: name.name,
+      species: name.species,
+      gender: name.gender,
+      mode: nameGenMode,
+      isCanon: name.isCanon,
+      isFamousFamily: name.isFamousFamily,
+      nameStructure: name.nameStructure,
+      isCrossSpeciesChaos: name.isCrossSpeciesChaos,
+      crossSpeciesParts: name.crossSpeciesParts,
+      timestamp: Date.now(),
+      addedFromMode: nameMode // Track what mode it was generated in
+    };
+    
+    setFavorites(prev => [...prev, favoriteItem]);
+    showToast(`"${name.name}" added to favorites! ⭐`);
+  };
+
+  const removeFromFavorites = (favoriteId) => {
+    setFavorites(prev => prev.filter(fav => fav.id !== favoriteId));
+    showToast('Removed from favorites');
+  };
+
+  const clearAllFavorites = () => {
+    if (window.confirm('Are you sure you want to clear all favorites? This cannot be undone.')) {
+      setFavorites([]);
+      showToast('All favorites cleared');
+    }
+  };
+
+  const exportFavorites = (format = 'json') => {
+    if (favorites.length === 0) {
+      showToast('No favorites to export');
+      return;
+    }
+
+    let content, filename, mimeType;
+    
+    if (format === 'json') {
+      content = JSON.stringify(favorites, null, 2);
+      filename = `starwars_favorites_${new Date().toISOString().split('T')[0]}.json`;
+      mimeType = 'application/json';
+    } else {
+      // Text format
+      content = favorites.map((fav, index) => 
+        `${index + 1}. ${fav.name} (${fav.species}, ${fav.gender})`
+      ).join('\n');
+      filename = `starwars_favorites_${new Date().toISOString().split('T')[0]}.txt`;
+      mimeType = 'text/plain';
+    }
+
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`Favorites exported as ${format.toUpperCase()}`);
+  };
+
+  const isInFavorites = (name) => {
+    return favorites.some(fav => fav.name === name.name && fav.species === name.species);
+  };
+
+  const showToast = (message) => {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '32px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = '#222';
+    toast.style.color = '#fff';
+    toast.style.padding = '8px 16px';
+    toast.style.borderRadius = '8px';
+    toast.style.zIndex = '9999';
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, 1500);
   };
 
   const generateNames = async () => {
@@ -563,12 +672,20 @@ export default function NameGenerator() {
             fullName = `${firstName} ${firstSpeciesOther}-${lastName}`;
           }
           else if (nameChance < 0.80 && secondLastName) {
-            // Double last name from same species
-            fullName = `${firstName} ${lastName}-${secondLastName}`;
+            // Double last name from same species - avoid duplicates
+            if (lastName !== secondLastName) {
+              fullName = `${firstName} ${lastName}-${secondLastName}`;
+            } else {
+              fullName = `${firstName} ${lastName}`; // Fall back to simple name if duplicate
+            }
           }
           else if (nameChance < 0.90 && secondFirstName) {
-            // Hyphenated first name from same species
-            fullName = `${firstName}-${secondFirstName} ${lastName}`;
+            // Hyphenated first name from same species - avoid duplicates
+            if (firstName !== secondFirstName) {
+              fullName = `${firstName}-${secondFirstName} ${lastName}`;
+            } else {
+              fullName = `${firstName} ${lastName}`; // Fall back to simple name if duplicate
+            }
           }
           // else stick with basic First Last (10%)
         }
@@ -861,13 +978,20 @@ export default function NameGenerator() {
         </div>
       )}
       
-      <div className="flex mb-8 justify-center">
+      <div className="flex mb-8 justify-center gap-4">
         <button
           onClick={generateNames}
           className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all text-sm"
         >
           <span>⚡</span>
           Generate Names
+        </button>
+        <button
+          onClick={() => setShowFavorites(true)}
+          className="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all text-sm"
+        >
+          <span>⭐</span>
+          Favorites ({favorites.length})
         </button>
       </div>
       
@@ -918,7 +1042,7 @@ export default function NameGenerator() {
                   {name.isFamousFamily && <span className="text-gray-400 ml-2">✧</span>}
                 </h3>
                 <div className="mt-1">
-                  <span className="bg-purple-800 text-white text-xs px-2 py-1 rounded-full">
+                  <span className="bg-purple-800 text-white text-xs px-2 py-1 rounded-full inline-block max-w-full break-words whitespace-normal">
                     {name.species}
                   </span>
                 </div>
@@ -973,6 +1097,20 @@ export default function NameGenerator() {
                 )}
                 
                 <div className="mt-3 flex gap-2">
+                  {/* Favorites Star Button */}
+                  <button 
+                    onClick={() => addToFavorites(name)}
+                    className={`${
+                      isInFavorites(name) 
+                        ? 'text-yellow-400' 
+                        : 'text-gray-400 hover:text-yellow-300'
+                    } transition-colors`}
+                    title={isInFavorites(name) ? 'Already in favorites' : 'Add to favorites'}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill={isInFavorites(name) ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  </button>
                   <button 
                     onClick={() => {
                       // Use a fallback for clipboard if navigator.clipboard fails
@@ -1091,6 +1229,145 @@ export default function NameGenerator() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Favorites Modal */}
+      {showFavorites && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-700">
+              <h2 className="text-xl font-bold flex items-center gap-2">
+                <span>⭐</span>
+                My Favorites ({favorites.length})
+              </h2>
+              <div className="flex items-center gap-2">
+                {favorites.length > 0 && (
+                  <>
+                    <button
+                      onClick={() => exportFavorites('txt')}
+                      className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm"
+                      title="Export as text file"
+                    >
+                      Export TXT
+                    </button>
+                    <button
+                      onClick={() => exportFavorites('json')}
+                      className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm"
+                      title="Export as JSON file"
+                    >
+                      Export JSON
+                    </button>
+                    <button
+                      onClick={clearAllFavorites}
+                      className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
+                    >
+                      Clear All
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={() => setShowFavorites(false)}
+                  className="text-gray-400 hover:text-white text-xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {favorites.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  <p className="text-lg mb-2">No favorites yet!</p>
+                  <p>Click the ⭐ button on any generated name to add it to your favorites.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {favorites.map((favorite) => (
+                    <div 
+                      key={favorite.id} 
+                      className={`bg-gray-700 p-4 rounded-lg shadow-md ${
+                        favorite.isCanon ? 'border-2 border-yellow-400' : 
+                        favorite.isFamousFamily ? 'border-2 border-gray-400' : 
+                        'border border-gray-600'
+                      } relative`}
+                    >
+                      {/* Remove button */}
+                      <button
+                        onClick={() => removeFromFavorites(favorite.id)}
+                        className="absolute top-2 right-2 text-gray-400 hover:text-red-400 text-lg"
+                        title="Remove from favorites"
+                      >
+                        ×
+                      </button>
+
+                      <div className="pr-6">
+                        <h3 className="text-lg font-bold mb-1 flex items-center gap-1">
+                          {favorite.isCanon && <span className="text-yellow-300">★</span>}
+                          {favorite.isFamousFamily && <span className="text-gray-400">✧</span>}
+                          {favorite.name}
+                        </h3>
+                        
+                        <div className="mb-2">
+                          <span className="bg-purple-800 text-white text-xs px-2 py-1 rounded-full">
+                            {favorite.species}
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-gray-400 space-y-1">
+                          <p>Gender: {favorite.gender}</p>
+                          <p>Added: {new Date(favorite.timestamp).toLocaleDateString()}</p>
+                          <p>From: {favorite.addedFromMode} ({favorite.mode})</p>
+                        </div>
+
+                        {/* Show special badges */}
+                        {favorite.isCanon && (
+                          <p className="text-xs text-yellow-400 mt-2 font-semibold">Canon Star Wars character</p>
+                        )}
+                        {favorite.isFamousFamily && (
+                          <p className="text-xs text-gray-400 mt-2 font-semibold">Famous Star Wars Family</p>
+                        )}
+                        {favorite.isCrossSpeciesChaos && (
+                          <p className="text-xs text-purple-400 mt-2 font-semibold">
+                            {favorite.crossSpeciesParts}-part Cross-species chaos
+                          </p>
+                        )}
+
+                        {/* Copy button */}
+                        <button 
+                          onClick={() => {
+                            if (navigator.clipboard && window.isSecureContext) {
+                              navigator.clipboard.writeText(favorite.name).then(() => {
+                                showToast('Name copied!');
+                              });
+                            } else {
+                              // Fallback for older browsers
+                              const textarea = document.createElement('textarea');
+                              textarea.value = favorite.name;
+                              document.body.appendChild(textarea);
+                              textarea.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(textarea);
+                              showToast('Name copied!');
+                            }
+                          }} 
+                          className="mt-2 text-gray-400 hover:text-white text-sm flex items-center gap-1" 
+                          title="Copy name"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

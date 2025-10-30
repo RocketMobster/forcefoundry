@@ -14,7 +14,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Styled_with-TailwindCSS-38bdf8?logo=tailwindcss&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![GitHub Pages](https://img.shields.io/badge/Deployed_on-GitHub_Pages-222?logo=github&logoColor=white)
-![Version](https://img.shields.io/badge/version-v2.2.0-brightgreen)
+![Version](https://img.shields.io/badge/version-v3.1.0-brightgreen)
 
 A comprehensive **Star Wars character and name generation tool** built with **Next.js** and **React**. Create authentic Star Wars characters with species-specific names, stats, and backgrounds.
 
@@ -25,10 +25,16 @@ A comprehensive **Star Wars character and name generation tool** built with **Ne
 ## ✨ Features
 
 ### 🎭 Character Generator
+- **SWTOR Class System**: Full Star Wars: The Old Republic class structure with 8 base classes, 16 advanced classes, and 48 skill trees
+- **Faction-Based Generation**: Choose between Galactic Republic and Sith Empire with appropriate classes
+- **Hierarchical Class Selection**: Base Class → Advanced Class → Skill Tree with proper restrictions
 - **Species-Specific Generation**: Choose from multiple Star Wars species or let it randomize
-- **Character Classes**: Jedi, Sith, Bounty Hunter, Smuggler with unique stats
-- **Comprehensive Details**: Names, alignment, homeworld, and character stats
-- **Download Characters**: Export generated characters as JSON files
+- **Comprehensive Details**: Names, alignment, homeworld, role, and SWTOR-specific stats (Strength, Endurance, Aim, Cunning, Willpower)
+- **Character Export Features**: 
+  - JSON export for data storage and sharing
+  - AI Prompt export for image generators (Stable Diffusion, Midjourney, etc.)
+  - Character Description export for RPG sessions with formatted character sheets
+- **Favorites Collection System**: Star favorite names, manage collection with localStorage persistence, export favorites as TXT/JSON
 
 ### 📝 Name Generator  
 - **Species-Specific Names**: Authentic names based on Star Wars species
@@ -43,25 +49,26 @@ A comprehensive **Star Wars character and name generation tool** built with **Ne
 - **Bulk Generation**: Generate multiple names at once
 
 ### 🛡️ Robust Features
+**SWTOR Class System**: Complete implementation of Star Wars: The Old Republic's class hierarchy
+**Smart Class Validation**: Ensures proper faction-class relationships and restrictions
+**Force User Detection**: Automatic lightsaber color assignment based on faction and alignment
 **Smart Fallback System**: Graceful handling of incomplete species data
 **Error Prevention**: No cross-species contamination in names
 **Responsive Design**: Works on desktop and mobile
 **Offline Capable**: No external API dependencies
-**Animated Navigation**: Single nav menu with smooth sliding animation
-**Advanced Generator UI**: Action buttons, gender color labels, and improved mobile spacing
+**Streamlined Navigation**: Clean header-based navigation with active state highlighting
+**Advanced Generator UI**: Action buttons, class descriptions, and improved mobile spacing
 
-A major update (v2.4.0) includes:
-- Refactored main file and page structure for maintainability
-- Fixed duplicate navigation menu rendering and improved nav animation
-- Restored advanced character generator UI and logic
-- Enhanced gender display and color labeling
-- Fixed star icon placement for canon/famous family name cards
-- Improved clipboard copy logic with robust fallback and toast feedback
-- Removed duplicate UI elements and redundant Layout wrappers
-- Updated info page JSX structure for correct rendering
-- Improved responsive design and spacing
-- All pages now use shared Layout via _app.js for consistent navigation
-- Fixed compilation errors due to JSX and closing tag issues
+A major update (v3.0.0) includes:
+- **Complete SWTOR Class System**: 8 base classes, 16 advanced classes, 48 skill trees
+- **Faction-Based Generation**: Galactic Republic vs Sith Empire with proper restrictions
+- **Hierarchical Class Selection**: Cascading dropdowns for Base Class → Advanced Class → Skill Tree
+- **SWTOR Stat System**: Strength, Endurance, Aim, Cunning, Willpower with HP calculation
+- **Enhanced Character Display**: Shows full class hierarchy, role, and descriptions
+- **Force User Logic**: Automatic detection and lightsaber color assignment
+- **Improved Navigation**: Removed accordion menu, integrated buttons into header
+- **Better Mobile Support**: Fixed button layouts and responsive design
+- **Class-Specific Equipment**: Equipment lists tailored to each advanced class
 
 ## 🛠️ Local Development
 
