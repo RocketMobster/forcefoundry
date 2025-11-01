@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
 import { getInternalLink } from '../utils/links';
+import { getDeviceType, isTouchDevice, getDeviceClasses } from '../utils/deviceUtils';
 
 // Shared Navigation Layout
 export default function Layout({ children }) {
   // Fix hydration mismatch by setting currentPath only on client side
   const [currentPath, setCurrentPath] = useState('');
+  
+  // Device optimization state - start with null to prevent hydration mismatch
+  const [deviceType, setDeviceType] = useState(null);
+  const [isTouch, setIsTouch] = useState(false);
+  const [deviceClasses, setDeviceClasses] = useState(null);
   
   useEffect(() => {
     const updatePath = () => {
@@ -29,6 +35,32 @@ export default function Layout({ children }) {
       window.removeEventListener('popstate', handleLocationChange);
       document.removeEventListener('click', handleLocationChange);
     };
+  }, []);
+
+  // Device detection and resize handling
+  useEffect(() => {
+    const updateDeviceInfo = () => {
+      const newDeviceType = getDeviceType();
+      const newIsTouch = isTouchDevice();
+      const newDeviceClasses = getDeviceClasses(newDeviceType, newIsTouch);
+      
+      setDeviceType(newDeviceType);
+      setIsTouch(newIsTouch);
+      setDeviceClasses(newDeviceClasses);
+    };
+
+    // Initial detection - only run on client side
+    if (typeof window !== 'undefined') {
+      updateDeviceInfo();
+
+      // Listen for resize events
+      const handleResize = () => {
+        updateDeviceInfo();
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   // Helper function to check if path is active
@@ -79,7 +111,7 @@ export default function Layout({ children }) {
             <div className="flex items-center justify-center gap-2 flex-wrap">
               <a
                 href={getInternalLink('/')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-150 min-w-0 ${
+                className={`flex items-center gap-2 ${deviceClasses?.navButtonSize || 'px-4 py-3 text-sm'} rounded-lg font-medium transition-colors duration-150 min-w-0 ${deviceClasses?.touchTarget || ''} ${
                   isActivePath(getInternalLink('/'))
                     ? 'bg-blue-600 text-white shadow-md' 
                     : 'bg-gray-700 text-gray-300 hover:bg-purple-600 hover:text-white'
@@ -92,7 +124,7 @@ export default function Layout({ children }) {
               </a>
               <a
                 href={getInternalLink('names')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-150 min-w-0 ${
+                className={`flex items-center gap-2 ${deviceClasses?.navButtonSize || 'px-4 py-3 text-sm'} rounded-lg font-medium transition-colors duration-150 min-w-0 ${deviceClasses?.touchTarget || ''} ${
                   isActivePath(getInternalLink('names'))
                     ? 'bg-blue-600 text-white shadow-md' 
                     : 'bg-gray-700 text-gray-300 hover:bg-purple-600 hover:text-white'
@@ -105,7 +137,7 @@ export default function Layout({ children }) {
               </a>
               <a
                 href={getInternalLink('info')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-150 min-w-0 ${
+                className={`flex items-center gap-2 ${deviceClasses?.navButtonSize || 'px-4 py-3 text-sm'} rounded-lg font-medium transition-colors duration-150 min-w-0 ${deviceClasses?.touchTarget || ''} ${
                   isActivePath(getInternalLink('info'))
                     ? 'bg-blue-600 text-white shadow-md' 
                     : 'bg-gray-700 text-gray-300 hover:bg-purple-600 hover:text-white'

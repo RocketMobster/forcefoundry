@@ -13,8 +13,10 @@ import maleLastNames from '../data/male_last_names.json';
 import femaleFirstNames from '../data/female_first_names.json';
 import femaleLastNames from '../data/female_last_names.json';
 import otherNamesNeutral from '../data/other_names_neutral.json';
+import jsPDF from 'jspdf';
 import canonNamesData from '../data/canon_names.json';
 import swtorClasses from '../data/swtor_classes.json';
+import { getDeviceType, isTouchDevice, getDeviceClasses } from '../utils/deviceUtils';
 
 // Character generation data
 const alignments = ["Light Side", "Gray", "Dark Side", "Neutral"];
@@ -117,12 +119,43 @@ export default function Home() {
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('character');
+  
+  // Device optimization state - start with null to prevent hydration mismatch
+  const [deviceType, setDeviceType] = useState(null);
+  const [isTouch, setIsTouch] = useState(false);
+  const [deviceClasses, setDeviceClasses] = useState(null);
 
   useEffect(() => {
     fetch(getResourceUrl('/data/species.json'))
       .then(res => res.json())
       .then(data => setAvailableSpecies(data))
       .catch(() => setAvailableSpecies([]));
+  }, []);
+
+  // Device detection and resize handling
+  useEffect(() => {
+    const updateDeviceInfo = () => {
+      const newDeviceType = getDeviceType();
+      const newIsTouch = isTouchDevice();
+      const newDeviceClasses = getDeviceClasses(newDeviceType, newIsTouch);
+      
+      setDeviceType(newDeviceType);
+      setIsTouch(newIsTouch);
+      setDeviceClasses(newDeviceClasses);
+    };
+
+    // Initial detection - only run on client side
+    if (typeof window !== 'undefined') {
+      updateDeviceInfo();
+
+      // Listen for resize events
+      const handleResize = () => {
+        updateDeviceInfo();
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   // Utility function to get a name from a specific species (or fallback to another)
@@ -289,6 +322,111 @@ export default function Home() {
     setLoading(false);
   };
 
+  // PDF Export Function
+  const generateCharacterPDF = () => {
+    const pdf = new jsPDF();
+    
+    // Set up fonts and colors
+    pdf.setFontSize(20);
+    pdf.text('Star Wars Character Sheet', 20, 25);
+    
+    // Character name and basic info
+    pdf.setFontSize(16);
+    pdf.text(character.name, 20, 40);
+    
+    pdf.setFontSize(12);
+    let yPos = 55;
+    
+    // Basic Information Section
+    pdf.text('=== Basic Information ===', 20, yPos);
+    yPos += 10;
+    pdf.text(`Species: ${character.species}`, 25, yPos);
+    yPos += 7;
+    pdf.text(`Gender: ${character.gender || 'Unknown'}`, 25, yPos);
+    yPos += 7;
+    pdf.text(`Faction: ${character.faction}`, 25, yPos);
+    yPos += 7;
+    pdf.text(`Alignment: ${character.alignment}`, 25, yPos);
+    yPos += 15;
+    
+    // Class Information Section
+    pdf.text('=== Class Information ===', 20, yPos);
+    yPos += 10;
+    pdf.text(`Base Class: ${character.baseClass}`, 25, yPos);
+    yPos += 7;
+    pdf.text(`Advanced Class: ${character.advancedClass}`, 25, yPos);
+    yPos += 7;
+    pdf.text(`Skill Tree: ${character.skillTree}`, 25, yPos);
+    yPos += 7;
+    pdf.text(`Role: ${character.role}`, 25, yPos);
+    yPos += 15;
+    
+    // Force Information Section (if applicable)
+    if (character.forceUser) {
+      pdf.text('=== Force Abilities ===', 20, yPos);
+      yPos += 10;
+      pdf.text('Force User: Yes', 25, yPos);
+      yPos += 7;
+      if (character.lightsaberColor) {
+        pdf.text(`Lightsaber Color: ${character.lightsaberColor}`, 25, yPos);
+        yPos += 7;
+      }
+      yPos += 8;
+    }
+    
+    // Stats Section
+    pdf.text('=== Character Stats ===', 20, yPos);
+    yPos += 10;
+    Object.entries(character.stats).forEach(([stat, value]) => {
+      pdf.text(`${stat}: ${value}`, 25, yPos);
+      yPos += 7;
+    });
+    yPos += 8;
+    
+    // Homeworld Section
+    if (character.homeworld && character.homeworld.name) {
+      pdf.text('=== Origin ===', 20, yPos);
+      yPos += 10;
+      pdf.text(`Homeworld: ${character.homeworld.name}`, 25, yPos);
+      yPos += 15;
+    }
+    
+    // Descriptions Section
+    if (character.description || character.skillTreeDescription) {
+      // Check if we need a new page
+      if (yPos > 250) {
+        pdf.addPage();
+        yPos = 25;
+      }
+      
+      pdf.text('=== Background & Abilities ===', 20, yPos);
+      yPos += 10;
+      
+      if (character.description) {
+        pdf.text('Class Description:', 25, yPos);
+        yPos += 7;
+        const descLines = pdf.splitTextToSize(character.description, 160);
+        pdf.text(descLines, 25, yPos);
+        yPos += (descLines.length * 7) + 8;
+      }
+      
+      if (character.skillTreeDescription) {
+        pdf.text('Specialization:', 25, yPos);
+        yPos += 7;
+        const specLines = pdf.splitTextToSize(character.skillTreeDescription, 160);
+        pdf.text(specLines, 25, yPos);
+        yPos += (specLines.length * 7) + 8;
+      }
+    }
+    
+    // Footer
+    pdf.setFontSize(10);
+    pdf.text(`Generated by ForceFoundry (https://github.com/RocketMobster/forcefoundry) on ${new Date(character._created).toLocaleDateString()}`, 20, 280);
+    
+    // Save the PDF
+    pdf.save(`${character.name.replace(/[^a-zA-Z0-9]/g, '_')}_Character_Sheet.pdf`);
+  };
+
   // Only one return statement below, containing all JSX
   return (
     <div className="w-full">
@@ -298,7 +436,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold mb-2">Character Generator</h2>
             <p className="text-gray-400">Create detailed Star Wars characters with stats and backgrounds</p>
           </div>
-          <div className="max-w-md mx-auto mb-6">
+          <div className={`max-w-md mx-auto mb-6 ${deviceClasses?.containerPadding || 'px-4'}`}>
             <label className="block text-sm font-medium text-gray-300 mb-2">Species Selection:</label>
             <select
               value={selectedSpecies}
@@ -417,14 +555,14 @@ export default function Home() {
             <>
               <div className="max-w-md mx-auto mb-6 flex flex-col gap-4 md:flex-row md:gap-4">
                 <button
-                  className="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg font-medium text-white md:mr-2"
+                  className={`bg-blue-600 hover:bg-blue-700 ${deviceClasses?.primaryButtonSize || 'px-6 py-4 text-sm'} rounded-lg font-medium text-white ${deviceClasses?.touchTarget || ''} md:mr-2 flex-1`}
                   disabled={loading}
                   onClick={generateCharacter}
                 >
                   Generate Character
                 </button>
                 <button
-                  className="bg-purple-600 hover:bg-purple-700 px-6 py-2 rounded-lg font-medium text-white"
+                  className={`bg-purple-600 hover:bg-purple-700 ${deviceClasses?.primaryButtonSize || 'px-6 py-4 text-sm'} rounded-lg font-medium text-white ${deviceClasses?.touchTarget || ''} flex-1`}
                   disabled={loading}
                   onClick={generateFullRandomCharacter}
                 >
@@ -440,9 +578,9 @@ export default function Home() {
           {character && (
             <>
               {/* Action buttons above character card */}
-              <div className="max-w-6xl mx-auto mt-8 mb-2 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 lg:gap-2 justify-center items-stretch">
+              <div className={`max-w-6xl mx-auto mt-8 mb-2 grid ${deviceClasses?.actionGrid || 'grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 lg:gap-2'} justify-center items-stretch`}>
                 <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  className={`bg-blue-600 hover:bg-blue-700 text-white w-full ${deviceClasses?.buttonSize || 'px-2 py-3 text-xs'} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses?.touchTarget || ''}`}
                   title="Same Type"
                   onClick={() => {
                     setLoading(true);
@@ -501,7 +639,7 @@ export default function Home() {
                   <span className="text-center leading-tight">Same Type</span>
                 </button>
                 <button
-                  className="bg-purple-600 hover:bg-purple-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  className={`bg-purple-600 hover:bg-purple-700 text-white w-full ${deviceClasses.buttonSize} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses.touchTarget}`}
                   title="New Character (Full Random)"
                   onClick={generateFullRandomCharacter}
                 >
@@ -509,7 +647,7 @@ export default function Home() {
                   <span className="text-center leading-tight">Full Random</span>
                 </button>
                 <button
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  className={`bg-yellow-500 hover:bg-yellow-600 text-white w-full ${deviceClasses.buttonSize} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses.touchTarget}`}
                   title="Reroll Stats"
                   onClick={() => {
                     setLoading(true);
@@ -535,7 +673,7 @@ export default function Home() {
                   <span className="text-center leading-tight">Reroll Stats</span>
                 </button>
                 <button
-                  className="bg-red-500 hover:bg-red-600 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  className={`bg-red-500 hover:bg-red-600 text-white w-full ${deviceClasses.buttonSize} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses.touchTarget}`}
                   title="Reroll Name"
                   onClick={() => {
                     let name = getNameFromSpecies(maleFirstNames, character.species) + " " + getNameFromSpecies(maleLastNames, character.species);
@@ -550,7 +688,7 @@ export default function Home() {
                   <span className="text-center leading-tight">Reroll Name</span>
                 </button>
                 <button
-                  className="bg-green-600 hover:bg-green-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  className={`bg-green-600 hover:bg-green-700 text-white w-full ${deviceClasses.buttonSize} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses.touchTarget}`}
                   title="Download JSON"
                   onClick={() => {
                     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(character, null, 2));
@@ -566,7 +704,7 @@ export default function Home() {
                   <span className="text-center leading-tight">JSON Export</span>
                 </button>
                 <button
-                  className="bg-cyan-600 hover:bg-cyan-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  className={`bg-cyan-600 hover:bg-cyan-700 text-white w-full ${deviceClasses.buttonSize} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses.touchTarget}`}
                   title="Copy Character Description"
                   onClick={() => {
                     const generateCharacterDescription = () => {
@@ -628,6 +766,7 @@ export default function Home() {
                       }
                       
                       description += `\n=== Generated by ForceFoundry ===\n`;
+                      description += `https://github.com/RocketMobster/forcefoundry\n`;
                       description += `Created: ${new Date(character._created).toLocaleDateString()}\n`;
                       
                       return description;
@@ -684,7 +823,7 @@ export default function Home() {
                   <span className="text-center leading-tight">Description</span>
                 </button>
                 <button
-                  className="bg-pink-600 hover:bg-pink-700 text-white w-full px-2 py-3 rounded-xl font-semibold flex flex-col items-center justify-center text-xs shadow-md transition-all duration-200 min-h-[4rem]"
+                  className={`bg-pink-600 hover:bg-pink-700 text-white w-full ${deviceClasses.buttonSize} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses.touchTarget}`}
                   title="Copy AI Prompt"
                   onClick={() => {
                     const generateAIPrompt = () => {
@@ -784,6 +923,14 @@ export default function Home() {
                   <span className="text-lg mb-1">🎨</span>
                   <span className="text-center leading-tight">Copy AI Prompt</span>
                 </button>
+                <button
+                  className={`bg-purple-600 hover:bg-purple-700 text-white w-full ${deviceClasses.buttonSize} rounded-xl font-semibold flex flex-col items-center justify-center shadow-md transition-all duration-200 ${deviceClasses.touchTarget}`}
+                  title="Export to PDF"
+                  onClick={generateCharacterPDF}
+                >
+                  <span className="text-lg mb-1">📄</span>
+                  <span className="text-center leading-tight">Export PDF</span>
+                </button>
               </div>
               {/* Explanation text below buttons */}
               <div className="max-w-lg mx-auto mb-4 mt-2 text-sm text-blue-200">
@@ -793,21 +940,34 @@ export default function Home() {
                   <span>🎲 <b>Reroll Stats/Name:</b> Regenerate specific character attributes</span>
                   <span>📋 <b>Description:</b> Copy formatted character sheet for RPG sessions</span>
                   <span>🎨 <b>AI Prompt:</b> Copy optimized prompt for AI image generators</span>
+                  <span>📄 <b>Export PDF:</b> Download professional character sheet as PDF document</span>
                 </div>
               </div>
               {/* Character Card Display */}
               <div className="max-w-lg mx-auto bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-700">
-                {/* Portrait area with faction-based icon */}
+                {/* Portrait area with class-based icon */}
                 <div className="flex justify-center items-center mb-4">
                   {(() => {
-                    if (character.forceUser) {
-                      return character.faction === "Galactic Republic" ? 
-                        <span className="text-blue-400 text-5xl" title="Republic Force User">🧑‍🚀</span> :
-                        <span className="text-red-500 text-5xl" title="Empire Force User">🦹‍♂️</span>;
-                    } else {
-                      return character.faction === "Galactic Republic" ?
-                        <span className="text-green-400 text-5xl" title="Republic Tech User">�️</span> :
-                        <span className="text-orange-400 text-5xl" title="Empire Tech User">💀</span>;
+                    // Base class specific icons
+                    switch(character.baseClass) {
+                      case "Jedi Knight":
+                        return <span className="text-blue-400 text-5xl" title="Jedi Knight">⚔️</span>;
+                      case "Jedi Consular":
+                        return <span className="text-cyan-400 text-5xl" title="Jedi Consular">🔮</span>;
+                      case "Trooper":
+                        return <span className="text-green-400 text-5xl" title="Trooper">🎖️</span>;
+                      case "Smuggler":
+                        return <span className="text-yellow-400 text-5xl" title="Smuggler">🎲</span>;
+                      case "Sith Warrior":
+                        return <span className="text-red-500 text-5xl" title="Sith Warrior">⚡</span>;
+                      case "Sith Inquisitor":
+                        return <span className="text-purple-500 text-5xl" title="Sith Inquisitor">🌀</span>;
+                      case "Bounty Hunter":
+                        return <span className="text-orange-400 text-5xl" title="Bounty Hunter">💀</span>;
+                      case "Imperial Agent":
+                        return <span className="text-gray-400 text-5xl" title="Imperial Agent">🎯</span>;
+                      default:
+                        return <span className="text-gray-400 text-5xl" title="Character">👤</span>;
                     }
                   })()}
                 </div>

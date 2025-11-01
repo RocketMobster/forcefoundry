@@ -26,14 +26,17 @@ The codebase has been simplified by removing all portrait generation code, API c
 - [x] Add button to copy character description formatted for AI image generators (Stable Diffusion, Midjourney) *(Completed v3.1.0)*
 - [x] Copy formatted character sheet for RPG sessions *(Completed v3.1.0)*
 - [x] Favorites Collection System with localStorage persistence and export functionality *(Completed v3.1.0)*
-- [ ] Export character sheet as PDF or formatted text
+- [x] Export character sheet as formatted text *(Completed v3.1.0)*
+- [x] Export character sheet as PDF *(Completed v3.2.0)*
+- [x] Add GitHub repository URL to all exports for discoverability *(Completed v3.2.0)*
+- [x] Unique class-specific character icons for all 8 base classes *(Completed v3.2.0)*
 - [ ] Share character via URL or social media
 
 ### 📱 Device Optimization
-- Detect device type on app load
-- Adjust UI elements for desktop vs mobile devices
-- Optimize navigation placement and button sizes
-- Enhanced responsive design for tablets
+- [x] Detect device type on app load *(Completed v3.1.1)*
+- [x] Adjust UI elements for desktop vs mobile devices *(Completed v3.1.1)*
+- [x] Optimize navigation placement and button sizes *(Completed v3.1.1)*
+- [x] Enhanced responsive design for tablets *(Completed v3.1.1)*
 
 # 🔮 Future Considerations (v3.2.0+)
 

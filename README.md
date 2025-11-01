@@ -14,7 +14,7 @@
 ![Tailwind CSS](https://img.shields.io/badge/Styled_with-TailwindCSS-38bdf8?logo=tailwindcss&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![GitHub Pages](https://img.shields.io/badge/Deployed_on-GitHub_Pages-222?logo=github&logoColor=white)
-![Version](https://img.shields.io/badge/version-v3.1.0-brightgreen)
+![Version](https://img.shields.io/badge/version-v3.2.0-brightgreen)
 
 A comprehensive **Star Wars character and name generation tool** built with **Next.js** and **React**. Create authentic Star Wars characters with species-specific names, stats, and backgrounds.
 
@@ -32,9 +32,12 @@ A comprehensive **Star Wars character and name generation tool** built with **Ne
 - **Comprehensive Details**: Names, alignment, homeworld, role, and SWTOR-specific stats (Strength, Endurance, Aim, Cunning, Willpower)
 - **Character Export Features**: 
   - JSON export for data storage and sharing
+  - PDF export for professional character sheets with automatic formatting
   - AI Prompt export for image generators (Stable Diffusion, Midjourney, etc.)
   - Character Description export for RPG sessions with formatted character sheets
+  - All exports include GitHub repository URL for discoverability
 - **Favorites Collection System**: Star favorite names, manage collection with localStorage persistence, export favorites as TXT/JSON
+- **Class-Specific Icons**: Each of the 8 base classes has a unique thematic icon (⚔️🔮🎖️🎲⚡🌀💀🎯)
 
 ### 📝 Name Generator  
 - **Species-Specific Names**: Authentic names based on Star Wars species

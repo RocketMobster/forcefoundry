@@ -1,3 +1,36 @@
+# [3.2.0] - 2025-10-31
+
+### 📄 PDF EXPORT & ENHANCED EXPORTS
+
+- **ADDED**: PDF Character Sheet Export
+  - Complete PDF generation with jsPDF library
+  - Multi-page PDF support with automatic page breaks
+  - Professional character sheet layout with all stats, equipment, and class details
+  - Automatic filename generation based on character name
+  - Footer with GitHub repository URL for discoverability
+  
+- **ENHANCED**: Export Attribution
+  - Added GitHub repository URL to all export formats
+  - Character Description export now includes repository link
+  - Name Generator details export includes repository link
+  - Improved discoverability for users who receive exported content
+  
+- **IMPROVED**: Character Class Icons
+  - Implemented unique icons for all 8 base classes
+  - Fixed missing Smuggler icon (🎲 dice)
+  - Fixed corrupted Sith Inquisitor icon (🌀 swirl)
+  - Each class now has thematically appropriate emoji:
+    - Jedi Knight: ⚔️ (crossed swords)
+    - Jedi Consular: 🔮 (crystal ball)
+    - Trooper: 🎖️ (military medal)
+    - Smuggler: 🎲 (dice)
+    - Sith Warrior: ⚡ (lightning)
+    - Sith Inquisitor: 🌀 (swirl)
+    - Bounty Hunter: 💀 (skull)
+    - Imperial Agent: 🎯 (target)
+
+---
+
 # [3.1.0] - 2025-10-30
 
 ### 🖼️ CHARACTER EXPORT & FAVORITES SYSTEM
