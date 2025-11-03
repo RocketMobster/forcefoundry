@@ -14,7 +14,7 @@ export default function Info() {
             <div className="space-y-3">
               <div>
                 <span className="text-gray-400">Version:</span>
-                <span className="ml-2 text-white font-mono bg-gray-700 px-2 py-1 rounded">v3.0.0</span>
+                <span className="ml-2 text-white font-mono bg-gray-700 px-2 py-1 rounded">v3.2.0</span>
               </div>
               <div>
                 <span className="text-gray-400">Developer:</span>
