@@ -74,7 +74,7 @@
         "secondary": ["Endurance", "Accuracy", "Critical Rating"],
         "base": { "strength": 15, "endurance": 14, "aim": 8, "cunning": 10, "willpower": 12 }
       },
-      "equipment": ["Lightsaber", "Heavy Armor", "Shield Generator", "Force Focus"]
+      "equipment": ["Single-bladed Lightsaber", "Centurion's Heavy Armor", "Shield Generator", "Force Focus", "Guardian's Earpiece", "Defensive Stance Relic", "Republic Med Pack"]
     },
     "Jedi Sentinel": {
       "baseClass": "Jedi Knight", 
@@ -98,9 +98,9 @@
       "stats": {
         "primary": "Strength",
         "secondary": ["Critical Rating", "Surge", "Accuracy"],
-        "base": { "strength": 16, "endurance": 12, "aim": 9, "cunning": 11, "willpower": 11 }
+        "base": { "strength": 15, "endurance": 12, "aim": 8, "cunning": 11, "willpower": 12 }
       },
-      "equipment": ["Dual Lightsabers", "Medium Armor", "Combat Stims", "Force Focus"]
+      "equipment": ["Dual Lightsabers", "Sentinel's Medium Armor", "Adrenal Combat Stims", "Force Focus", "Precision Targeting Module", "Battle Meditation Relic", "Emergency Medpac"]
     },
     "Jedi Sage": {
       "baseClass": "Jedi Consular",
@@ -126,7 +126,7 @@
         "secondary": ["Endurance", "Critical Rating", "Surge"],
         "base": { "strength": 8, "endurance": 12, "aim": 8, "cunning": 11, "willpower": 16 }
       },
-      "equipment": ["Lightsaber", "Light Armor", "Force Focus", "Meditation Crystal"]
+      "equipment": ["Single-bladed Lightsaber", "Sage's Light Robes", "Force Focus", "Kyber Meditation Crystal", "Force Clarity Implant", "Wisdom of the Jedi Relic", "Force Healing Serum"]
     },
     "Jedi Shadow": {
       "baseClass": "Jedi Consular",
@@ -152,7 +152,7 @@
         "secondary": ["Endurance", "Critical Rating", "Accuracy"], 
         "base": { "strength": 10, "endurance": 13, "aim": 9, "cunning": 12, "willpower": 15 }
       },
-      "equipment": ["Double-bladed Lightsaber", "Medium Armor", "Stealth Field", "Force Focus"]
+      "equipment": ["Double-bladed Lightsaber", "Shadow's Stealth Robes", "Force Cloak Generator", "Shadow Focus", "Infiltration Implant", "Veil of Darkness Relic", "Force Phase Serum"]
     },
     "Commando": {
       "baseClass": "Trooper",
@@ -178,7 +178,7 @@
         "secondary": ["Endurance", "Critical Rating", "Surge"],
         "base": { "strength": 11, "endurance": 13, "aim": 15, "cunning": 10, "willpower": 10 }
       },
-      "equipment": ["Assault Cannon", "Heavy Armor", "Medical Scanner", "Combat Stims"]
+      "equipment": ["Havoc Squad Assault Cannon", "Commando's Heavy Armor", "Advanced Medical Scanner", "Combat Support Cell", "Field Medic Implant", "Rapid Response Relic", "Kolto Infusion Pack"]
     },
     "Vanguard": {
       "baseClass": "Trooper",
@@ -204,7 +204,7 @@
         "secondary": ["Endurance", "Accuracy", "Critical Rating"],
         "base": { "strength": 12, "endurance": 15, "aim": 14, "cunning": 9, "willpower": 9 }
       },
-      "equipment": ["Blaster Rifle", "Heavy Armor", "Energy Shield", "Riot Gas"]
+      "equipment": ["High-Impact Blaster Rifle", "Vanguard's Heavy Armor", "Reactive Energy Shield", "Ion Cell", "Shield Generator Implant", "Fortress Defense Relic", "Fortitude Stim"]
     },
     "Gunslinger": {
       "baseClass": "Smuggler",
@@ -230,7 +230,7 @@
         "secondary": ["Critical Rating", "Surge", "Accuracy"],
         "base": { "strength": 9, "endurance": 11, "aim": 12, "cunning": 16, "willpower": 11 }
       },
-      "equipment": ["Dual Blaster Pistols", "Medium Armor", "Portable Cover", "Flash Grenades"]
+      "equipment": ["Matched Pair Blaster Pistols", "Gunslinger's Duster Coat", "Portable Cover Shield", "Smuggler's Luck Charm", "Quick Draw Implant", "Sharpshooter's Relic", "Czerka Flash Grenades"]
     },
     "Scoundrel": {
       "baseClass": "Smuggler",
@@ -256,7 +256,7 @@
         "secondary": ["Endurance", "Critical Rating", "Accuracy"],
         "base": { "strength": 10, "endurance": 12, "aim": 11, "cunning": 15, "willpower": 11 }
       },
-      "equipment": ["Scattergun", "Light Armor", "Stealth Generator", "Med Pack"]
+      "equipment": ["Underworld Scattergun", "Scoundrel's Leather Jacket", "Stealth Field Generator", "Smuggler's Earpiece", "Dirty Fighting Implant", "Back Blast Relic", "Underworld Med Pack"]
     },
     "Sith Juggernaut": {
       "baseClass": "Sith Warrior",
@@ -282,7 +282,7 @@
         "secondary": ["Endurance", "Accuracy", "Critical Rating"],
         "base": { "strength": 15, "endurance": 14, "aim": 8, "cunning": 10, "willpower": 12 }
       },
-      "equipment": ["Lightsaber", "Heavy Armor", "Sith Focus", "Dark Side Relic"]
+      "equipment": ["Single-bladed Lightsaber", "Juggernaut's Heavy Armor", "Sith War Focus", "Dark Fortitude Implant", "Immortal Rage Relic", "Dark Side Enhancement", "Rage Adrenal"]
     },
     "Sith Marauder": {
       "baseClass": "Sith Warrior",
@@ -308,7 +308,7 @@
         "secondary": ["Critical Rating", "Surge", "Accuracy"],
         "base": { "strength": 16, "endurance": 12, "aim": 9, "cunning": 11, "willpower": 11 }
       },
-      "equipment": ["Dual Lightsabers", "Medium Armor", "Rage Stims", "Sith Focus"]
+      "equipment": ["Twin Lightsabers of Fury", "Marauder's Battle Armor", "Bloodthirst Stim", "Dark Rage Focus", "Juyo Form Implant", "Annihilation Relic", "Berserker Adrenal"]
     },
     "Sith Sorcerer": {
       "baseClass": "Sith Inquisitor",
@@ -334,7 +334,7 @@
         "secondary": ["Endurance", "Critical Rating", "Surge"], 
         "base": { "strength": 8, "endurance": 12, "aim": 8, "cunning": 11, "willpower": 16 }
       },
-      "equipment": ["Lightsaber", "Light Armor", "Sith Focus", "Force Lightning Rod"]
+      "equipment": ["Ancient Sith Lightsaber", "Sorcerer's Dark Robes", "Dark Side Focus", "Crackling Lightning Implant", "Force Storm Relic", "Dark Healing Serum", "Force Infusion Adrenal"]
     },
     "Sith Assassin": {
       "baseClass": "Sith Inquisitor",
@@ -360,7 +360,7 @@
         "secondary": ["Endurance", "Critical Rating", "Accuracy"],
         "base": { "strength": 10, "endurance": 13, "aim": 9, "cunning": 12, "willpower": 15 }
       },
-      "equipment": ["Double-bladed Lightsaber", "Medium Armor", "Stealth Field", "Sith Focus"]
+      "equipment": ["Double-bladed Lightsaber", "Assassin's Shadow Armor", "Dark Shroud Generator", "Deception Focus", "Assassin's Earpiece", "Dark Ward Relic", "Sith Phase Serum"]
     },
     "Mercenary": {
       "baseClass": "Bounty Hunter",
@@ -386,7 +386,7 @@
         "secondary": ["Endurance", "Critical Rating", "Surge"],
         "base": { "strength": 11, "endurance": 13, "aim": 15, "cunning": 10, "willpower": 10 }
       },
-      "equipment": ["Heavy Blasters", "Heavy Armor", "Medical Scanner", "Missile Launcher"]
+      "equipment": ["Dual Heavy Blasters", "Mercenary's Battle Armor", "Combat Medic Scanner", "Tracking Implant", "Arsenal Relic", "Missile Payload Module", "Emergency Kolto Pack"]
     },
     "Powertech": {
       "baseClass": "Bounty Hunter", 
@@ -412,7 +412,7 @@
         "secondary": ["Endurance", "Accuracy", "Critical Rating"],
         "base": { "strength": 12, "endurance": 15, "aim": 14, "cunning": 9, "willpower": 9 }
       },
-      "equipment": ["Blaster Pistol", "Heavy Armor", "Energy Shield", "Flamethrower"]
+      "equipment": ["Modified Blaster Pistol", "Powertech's Heavy Armor", "Prototype Energy Shield", "Wrist-Mounted Flamethrower", "Shield Tech Implant", "Reactive Shield Relic", "Kolto Defense Injector"]
     },
     "Operative": {
       "baseClass": "Imperial Agent",
@@ -438,7 +438,7 @@
         "secondary": ["Endurance", "Critical Rating", "Accuracy"],
         "base": { "strength": 10, "endurance": 12, "aim": 11, "cunning": 15, "willpower": 11 }
       },
-      "equipment": ["Vibroknife", "Light Armor", "Stealth Generator", "Medical Probe"]
+      "equipment": ["Imperial Vibroknife", "Operative's Stealth Suit", "Cloaking Device", "Agent's Earpiece", "Lethality Implant", "Tactical Superiority Relic", "Advanced Kolto Probe"]
     },
     "Sniper": {
       "baseClass": "Imperial Agent",
@@ -464,7 +464,7 @@
         "secondary": ["Critical Rating", "Surge", "Accuracy"], 
         "base": { "strength": 9, "endurance": 11, "aim": 12, "cunning": 16, "willpower": 11 }
       },
-      "equipment": ["Sniper Rifle", "Medium Armor", "Portable Cover", "Probe Droid"]
+      "equipment": ["Imperial Sniper Rifle", "Sniper's Tactical Armor", "Deployable Cover Shield", "Targeting Implant", "Marksmanship Relic", "Series 99 Probe Droid", "Precision Stim"]
     }
   }
 }
