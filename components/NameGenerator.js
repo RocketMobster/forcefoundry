@@ -342,6 +342,128 @@ export default function NameGenerator() {
       
       // Create a local copy of usedCanonNames to ensure we don't reuse names within this batch
       let localUsedCanonNames = [...usedCanonNames];
+
+      // Track generated full names within this batch to reduce repeats.
+      const generatedNameSet = new Set();
+
+      const getSpeciesPool = (nameData, speciesKey) => {
+        if (!nameData || !speciesKey || typeof speciesKey !== 'string') {
+          return [];
+        }
+
+        if (Array.isArray(nameData[speciesKey]) && nameData[speciesKey].length > 0) {
+          return nameData[speciesKey];
+        }
+
+        const matchingKey = Object.keys(nameData).find(
+          key => key.startsWith(`${speciesKey}/`) || key.includes(`/${speciesKey}`)
+        );
+
+        if (matchingKey && Array.isArray(nameData[matchingKey]) && nameData[matchingKey].length > 0) {
+          return nameData[matchingKey];
+        }
+
+        if (Array.isArray(nameData['Human/Common']) && nameData['Human/Common'].length > 0) {
+          return nameData['Human/Common'];
+        }
+
+        return [];
+      };
+
+      const pickRandom = (arr, fallback = 'Unknown') => {
+        if (!Array.isArray(arr) || arr.length === 0) {
+          return fallback;
+        }
+        return arr[Math.floor(Math.random() * arr.length)];
+      };
+
+      const normalizeToken = (value) => String(value || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
+
+      const pickDistinct = (arr, excluded = new Set(), fallback = 'Unknown') => {
+        if (!Array.isArray(arr) || arr.length === 0) {
+          return fallback;
+        }
+
+        for (let attempt = 0; attempt < 25; attempt++) {
+          const candidate = pickRandom(arr, fallback);
+          if (!excluded.has(normalizeToken(candidate))) {
+            return candidate;
+          }
+        }
+
+        return fallback;
+      };
+
+      const buildBalancedName = (speciesKey, currentGender, baseFirst = null, baseLast = null) => {
+        const speciesParts = typeof speciesKey === 'string' ? speciesKey.split('/').filter(Boolean) : [];
+        const primarySpecies = speciesParts[0] || nameMode || 'Human/Common';
+        const firstNameData = currentGender === 'male' ? maleFirst : femaleFirst;
+
+        const firstPool = getSpeciesPool(firstNameData, primarySpecies);
+        const lastPool = getSpeciesPool(lastNames, primarySpecies);
+        const neutralPool = getSpeciesPool(neutral, primarySpecies);
+
+        const first = baseFirst || pickRandom(firstPool, 'Unknown');
+        const used = new Set([normalizeToken(first)]);
+        const last = baseLast && !used.has(normalizeToken(baseLast))
+          ? baseLast
+          : pickDistinct(lastPool, used, baseLast || 'Unknown');
+        used.add(normalizeToken(last));
+
+        const middle = pickDistinct(neutralPool, used, '');
+        const altLast = pickDistinct(lastPool, used, last);
+        const altFirst = pickDistinct(firstPool, used, first);
+
+        const roll = Math.random();
+
+        // Bulk of names stay simple first + last.
+        if (roll < 0.72) {
+          return `${first} ${last}`;
+        }
+
+        // Moderate amount of middle names.
+        if (roll < 0.90 && middle && normalizeToken(middle) !== normalizeToken(first) && normalizeToken(middle) !== normalizeToken(last)) {
+          return `${first} ${middle} ${last}`;
+        }
+
+        // Controlled hyphenation: only one hyphenated part per generated name.
+        if (roll < 0.96 && altLast && normalizeToken(altLast) !== normalizeToken(last) && normalizeToken(altLast) !== normalizeToken(first)) {
+          return `${first} ${last}-${altLast}`;
+        }
+
+        if (altFirst && normalizeToken(altFirst) !== normalizeToken(first) && normalizeToken(altFirst) !== normalizeToken(last)) {
+          return `${first}-${altFirst} ${last}`;
+        }
+
+        return `${first} ${last}`;
+      };
+
+      const ensureUniqueFullName = (candidateName, speciesKey, currentGender) => {
+        const normalized = (candidateName || 'Unknown Name').toLowerCase();
+        if (!generatedNameSet.has(normalized)) {
+          generatedNameSet.add(normalized);
+          return candidateName || 'Unknown Name';
+        }
+
+        for (let attempt = 0; attempt < 20; attempt++) {
+          const variant = buildBalancedName(speciesKey, currentGender);
+          const variantKey = variant.toLowerCase();
+          if (!generatedNameSet.has(variantKey)) {
+            generatedNameSet.add(variantKey);
+            return variant;
+          }
+        }
+
+        // Last-resort uniqueness fallback for very small pools.
+        let fallbackCounter = 2;
+        let fallbackName = `${candidateName || 'Unknown Name'} ${fallbackCounter}`;
+        while (generatedNameSet.has(fallbackName.toLowerCase()) && fallbackCounter < 50) {
+          fallbackCounter += 1;
+          fallbackName = `${candidateName || 'Unknown Name'} ${fallbackCounter}`;
+        }
+        generatedNameSet.add(fallbackName.toLowerCase());
+        return fallbackName;
+      };
       
       for (let i = 0; i < quantity; i++) {
         let firstName, lastName, species, fullName, middleName;
@@ -423,59 +545,7 @@ export default function NameGenerator() {
             lastName = getSpeciesSpecificName(lastNames, species, 'neutral');
           }
           
-          fullName = `${firstName} ${lastName}`;
-          
-          // Enhanced name variation system with all combinations
-          // Check if we have other/neutral names for this species
-          const hasSpeciesSpecificNeutral = neutral[species]?.length > 0;
-          const hasSpeciesSpecificLastNames = lastNames[species]?.length > 0;
-          const hasSpeciesSpecificFirstNames = (currentGender === 'male' ? maleFirst : femaleFirst)[species]?.length > 0;
-          
-          // Only offer complex name structures if we have enough species-specific name components
-          if (hasSpeciesSpecificNeutral && hasSpeciesSpecificLastNames && hasSpeciesSpecificFirstNames) {
-            const nameChance = Math.random();
-            const lastNameData = lastNames;
-            const firstNameData = currentGender === 'male' ? maleFirst : femaleFirst;
-            
-            // Ensure we're using species-specific names for all components
-            const otherName = neutral[species][Math.floor(Math.random() * neutral[species].length)];
-            const middleName = neutral[species][Math.floor(Math.random() * neutral[species].length)];
-            const secondLastName = lastNameData[species][Math.floor(Math.random() * lastNameData[species].length)];
-            const secondFirstName = firstNameData[species][Math.floor(Math.random() * firstNameData[species].length)];
-            
-            // Adjusted probabilities - increased chance of standard names (First Last)
-            if (nameChance < 0.12) { // First Middle Last (12%)
-              fullName = `${firstName} ${middleName} ${lastName}`;
-            } 
-            else if (nameChance < 0.20) { // First Middle Last-Other (8%)
-              fullName = `${firstName} ${middleName} ${lastName}-${otherName}`;
-            } 
-            else if (nameChance < 0.28) { // First Middle Other-Last (8%)
-              fullName = `${firstName} ${middleName} ${otherName}-${lastName}`;
-            } 
-            else if (nameChance < 0.36) { // First Last-Other (8%)
-              fullName = `${firstName} ${lastName}-${otherName}`;
-            } 
-            else if (nameChance < 0.44) { // First Other-Last (8%)
-              fullName = `${firstName} ${otherName}-${lastName}`;
-            } 
-            else if (nameChance < 0.52 && secondLastName) { // First Last-LastName2 (8%)
-              fullName = `${firstName} ${lastName}-${secondLastName}`;
-            }
-            else if (nameChance < 0.60 && secondLastName) { // First Middle Last-LastName2 (8%)
-              fullName = `${firstName} ${middleName} ${lastName}-${secondLastName}`;
-            }
-            else if (nameChance < 0.68) { // First Other Last (8%)
-              fullName = `${firstName} ${otherName} ${lastName}`;
-            }
-            else if (nameChance < 0.73 && secondFirstName) { // First-First2 Last (5%)
-              fullName = `${firstName}-${secondFirstName} ${lastName}`;
-            }
-            else if (nameChance < 0.78 && otherName) { // First-Other Last (5%)
-              fullName = `${firstName}-${otherName} ${lastName}`;
-            }
-            // else keep standard First Last (22%)
-          }
+          fullName = buildBalancedName(species, currentGender, firstName, lastName);
         }
         else if (nameGenMode === "random") {
           // Random mode - pick a random species for each name (but be consistent within the name)
@@ -502,7 +572,7 @@ export default function NameGenerator() {
             }
             
             // Filter out already used canon names
-            randomSpeciesCanonNames = randomSpeciesCanonNames.filter(name => !usedCanonNames.includes(name));
+            randomSpeciesCanonNames = randomSpeciesCanonNames.filter(name => !localUsedCanonNames.includes(name));
             
             // Filter for gender-appropriate canon names
             if (Object.keys(canonGenderMap).length > 0) {
@@ -518,9 +588,9 @@ export default function NameGenerator() {
           const useRandomCanonName = Math.random() < 0.05 && randomSpeciesCanonNames.length > 0 && nameGenMode !== "crazy";
           if (useRandomCanonName) {
             const randomCanonName = randomSpeciesCanonNames[Math.floor(Math.random() * randomSpeciesCanonNames.length)];
-            fullName = randomCanonName;
-            // Track this canon name as used
-            setUsedCanonNames(prev => [...prev, randomCanonName]);
+            fullName = ensureUniqueFullName(randomCanonName, species, currentGender);
+            // Track this canon name as used in local batch state
+            localUsedCanonNames.push(randomCanonName);
             // Continue to the next iteration of the loop since we already have the full name
             newNames.push({
               id: `name-${Date.now()}-${i}`,
@@ -543,58 +613,7 @@ export default function NameGenerator() {
             lastName = getSpeciesSpecificName(lastNames, species, 'neutral');
           }
           
-          fullName = `${firstName} ${lastName}`;
-          
-          // Add enhanced variations for random mode too
-          // Check if we have sufficient species-specific name components
-          const hasSpeciesSpecificNeutral = neutral[species]?.length > 0;
-          const hasSpeciesSpecificLastNames = lastNames[species]?.length > 0;
-          const hasSpeciesSpecificFirstNames = (currentGender === 'male' ? maleFirst : femaleFirst)[species]?.length > 0;
-          
-          // Only offer complex name structures if we have enough species-specific name components
-          if (hasSpeciesSpecificNeutral && hasSpeciesSpecificLastNames && hasSpeciesSpecificFirstNames) {
-            const nameChance = Math.random();
-            const lastNameData = lastNames;
-            const firstNameData = currentGender === 'male' ? maleFirst : femaleFirst;
-            
-            // Ensure we're using species-specific names for all components
-            const otherName = neutral[species][Math.floor(Math.random() * neutral[species].length)];
-            const middleName = neutral[species][Math.floor(Math.random() * neutral[species].length)];
-            const secondLastName = lastNameData[species][Math.floor(Math.random() * lastNameData[species].length)];
-            const secondFirstName = firstNameData[species][Math.floor(Math.random() * firstNameData[species].length)];
-            
-            // Updated probabilities to match species mode
-            if (nameChance < 0.12) { // First Middle Last (12%)
-              fullName = `${firstName} ${middleName} ${lastName}`;
-            } 
-            else if (nameChance < 0.20) { // First Middle Last-Other (8%)
-              fullName = `${firstName} ${middleName} ${lastName}-${otherName}`;
-            } 
-            else if (nameChance < 0.28) { // First Middle Other-Last (8%)
-              fullName = `${firstName} ${middleName} ${otherName}-${lastName}`;
-            } 
-            else if (nameChance < 0.36) { // First Last-Other (8%)
-              fullName = `${firstName} ${lastName}-${otherName}`;
-            } 
-            else if (nameChance < 0.44) { // First Other-Last (8%)
-              fullName = `${firstName} ${otherName}-${lastName}`;
-            } 
-            else if (nameChance < 0.52 && secondLastName) { // First Last-LastName2 (8%)
-              fullName = `${firstName} ${lastName}-${secondLastName}`;
-            }
-            else if (nameChance < 0.60 && secondLastName) { // First Middle Last-LastName2 (8%)
-              fullName = `${firstName} ${middleName} ${lastName}-${secondLastName}`;
-            }
-            else if (nameChance < 0.85) { // First Other Last (10%)
-              fullName = `${firstName} ${otherName} ${lastName}`;
-            }
-            else if (nameChance < 0.90 && secondFirstName) { // First-First2 Last (5%)
-              fullName = `${firstName}-${secondFirstName} ${lastName}`;
-            }
-            else if (nameChance < 0.95 && otherName) { // First-Other Last (5%)
-              fullName = `${firstName}-${otherName} ${lastName}`;
-            }
-          }
+          fullName = buildBalancedName(species, currentGender, firstName, lastName);
         }
         else if (nameGenMode === "crazy") {
           // Crazy mix - mix species for first, middle, and last name (up to 3 different species)
@@ -721,6 +740,8 @@ export default function NameGenerator() {
           }
           // else stick with basic First Last (10%)
         }
+
+        fullName = ensureUniqueFullName(fullName, species, currentGender);
         
         // Check if name is a canon Star Wars name (case-insensitive)
         // Variables already declared at the top of the loop

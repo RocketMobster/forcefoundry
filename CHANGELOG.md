@@ -1,3 +1,24 @@
+# [3.2.1] - 2026-03-13
+
+### 🧬 NAME LIBRARY LORE PASS
+
+- **ENHANCED**: Human-core vs species-flavored naming split
+  - Kept `Human/Common` pools as canonical base name libraries
+  - Applied species-flavored variants to selected humanoid species pools
+  - Reduced direct cross-species copy/paste repetition in generated names
+
+- **ADDED**: Major name pool expansion from curated user-provided lists
+  - Added new male and female name sets to Human first/last pools
+  - Added deduplicated name expansions to neutral pools used for mixed structures
+  - Expanded compatible species pools (Mandalorian, Chiss/Core-world, Mirialan, Zabrak, Togruta)
+
+- **IMPROVED**: Canon-safe Chiss and Zabrak refinement
+  - Added a canon guard pass to preserve canonical species token forms
+  - Removed auto-generated drift for protected canon tokens
+  - Kept species flavoring focused on imported expansion names
+
+---
+
 # [3.2.0] - 2025-10-31
 
 ### 📄 PDF EXPORT & ENHANCED EXPORTS
